@@ -1,0 +1,7 @@
+{
+  "name": "Tambua Dashboard",
+  "description": "A comprehensive system for managing vehicle registration, insurance, fines, and payments for Goma, RDC. This application provides a dashboard for administrators and agents to oversee operations, manage data, and take necessary actions.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
