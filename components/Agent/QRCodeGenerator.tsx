@@ -8,17 +8,23 @@ declare global {
 }
 
 interface QRCodeGeneratorProps {
-  data: object;
+  text: string;
   size?: number;
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ data, size = 48 }) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ text, size = 48 }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   useEffect(() => {
-    if (data && typeof window.QRCode !== 'undefined') {
-      const jsonString = JSON.stringify(data, null, 2);
-      window.QRCode.toDataURL(jsonString, { errorCorrectionLevel: 'H' }, (err: Error | null, url: string) => {
+    if (text && typeof window.QRCode !== 'undefined') {
+      // Options pour améliorer la qualité visuelle
+      const options = {
+        errorCorrectionLevel: 'H' as 'H',
+        width: size * 4, // Générer à une résolution plus élevée
+        margin: 1,
+      };
+      
+      window.QRCode.toDataURL(text, options, (err: Error | null, url: string) => {
         if (err) {
           console.error("Erreur de génération du QR Code:", err);
           return;
@@ -26,13 +32,13 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ data, size = 48 }) =>
         setQrCodeUrl(url);
       });
     }
-  }, [data]);
+  }, [text, size]);
 
   if (!qrCodeUrl) {
     return <div style={{ width: size, height: size }} className="bg-gray-200 animate-pulse rounded-sm"></div>;
   }
 
-  return <img src={qrCodeUrl} alt="QR Code" style={{ width: size, height: size }} />;
+  return <img src={qrCodeUrl} alt="QR Code" style={{ width: size, height: size, imageRendering: 'pixelated' }} />;
 };
 
 export default QRCodeGenerator;

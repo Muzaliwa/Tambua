@@ -25,11 +25,18 @@ const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => 
 
 const PrintableLicense: React.FC<PrintableLicenseProps> = ({ data }) => {
   const isExpired = new Date(data.expiryDate) < new Date();
-  const qrCodeData = {
-    type: 'PERMIS_DE_CONDUIRE',
-    status: isExpired ? 'Expiré' : 'Valide',
-    ...data,
-  };
+  const qrCodeText = [
+    `TYPE: PERMIS DE CONDUIRE`,
+    `STATUT: ${isExpired ? 'Expiré' : 'Valide'}`,
+    `NUMERO: ${data.licenseNumber}`,
+    `NOM: ${data.lastName}`,
+    `PRENOM: ${data.firstName}`,
+    `DATE_NAISSANCE: ${new Date(data.dob).toLocaleDateString('fr-CA')}`,
+    `DATE_EMISSION: ${new Date(data.issueDate).toLocaleDateString('fr-CA')}`,
+    `DATE_EXPIRATION: ${new Date(data.expiryDate).toLocaleDateString('fr-CA')}`,
+    `CATEGORIES: ${data.categories.join(', ')}`,
+    `ZONE: ${data.zone}`
+  ].join('\n');
 
   return (
     <div className="printable-area print-card-format">
@@ -77,7 +84,7 @@ const PrintableLicense: React.FC<PrintableLicenseProps> = ({ data }) => {
         
         {/* QR Code */}
         <div className="absolute bottom-1 right-1 z-20">
-          <QRCodeGenerator data={qrCodeData} size={48} />
+          <QRCodeGenerator text={qrCodeText} size={48} />
         </div>
       </div>
     </div>

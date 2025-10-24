@@ -24,11 +24,19 @@ const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => 
 );
 
 const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
-  const qrCodeData = {
-    type: 'CARTE_ROSE',
-    status: 'Valide',
-    ...data,
-  };
+  const qrCodeText = [
+    `TYPE: CARTE ROSE (CERTIFICAT D'IMMATRICULATION)`,
+    `STATUT: Valide`,
+    `PLAQUE: ${data.plate}`,
+    `PROPRIETAIRE: ${data.owner}`,
+    `ADRESSE: ${data.address}`,
+    `MARQUE: ${data.make}`,
+    `MODELE: ${data.model}`,
+    `CHASSIS: ${data.chassis}`,
+    `ANNEE: ${data.year}`,
+    `DATE_EMISSION: ${new Date(data.issueDate).toLocaleDateString('fr-CA')}`,
+    `ZONE: ${data.zone}`
+  ].join('\n');
   
   return (
     <div className="printable-area print-card-format">
@@ -67,7 +75,7 @@ const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
 
         {/* QR Code */}
         <div className="absolute bottom-1 right-1 z-20">
-            <QRCodeGenerator data={qrCodeData} size={48} />
+            <QRCodeGenerator text={qrCodeText} size={48} />
         </div>
       </div>
     </div>

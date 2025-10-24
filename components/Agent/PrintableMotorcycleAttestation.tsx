@@ -23,11 +23,18 @@ const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => 
 );
 
 const PrintableMotorcycleAttestation: React.FC<PrintableMotorcycleAttestationProps> = ({ data }) => {
-  const qrCodeData = {
-    type: 'ATTESTATION_MOTO',
-    status: 'Valide',
-    ...data,
-  };
+  const qrCodeText = [
+    `TYPE: ATTESTATION DE PROPRIETE MOTO`,
+    `STATUT: Valide`,
+    `PLAQUE: ${data.plate}`,
+    `PROPRIETAIRE: ${data.owner}`,
+    `ADRESSE: ${data.address}`,
+    `MARQUE/MODELE: ${data.makeModel}`,
+    `CHASSIS: ${data.chassis}`,
+    `ANNEE: ${data.year}`,
+    `QR_NUMERO: ${data.qrCode}`,
+    `ZONE: ${data.zone}`
+  ].join('\n');
   
   return (
     <div className="printable-area print-card-format">
@@ -66,7 +73,7 @@ const PrintableMotorcycleAttestation: React.FC<PrintableMotorcycleAttestationPro
 
         {/* QR Code */}
         <div className="absolute bottom-1 right-1 z-20">
-            <QRCodeGenerator data={qrCodeData} size={48} />
+            <QRCodeGenerator text={qrCodeText} size={48} />
         </div>
       </div>
     </div>
