@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Car, CircleAlert, FileText, Settings, Printer, Bike } from 'lucide-react';
+import { LayoutDashboard, Car, CircleAlert, FileText, Settings, Printer, Bike, Users, BarChartBig } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar: React.FC = () => {
@@ -12,6 +12,8 @@ const Sidebar: React.FC = () => {
     { to: '/motorcycles', icon: Bike, label: 'Motos' },
     { to: '/fines', icon: CircleAlert, label: 'Amendes' },
     { to: '/infractions', icon: FileText, label: 'Infractions' },
+    { to: '/agents', icon: Users, label: 'Agents' },
+    { to: '/reports', icon: BarChartBig, label: 'Rapports' },
     { to: '/settings', icon: Settings, label: 'Paramètres' },
   ];
 

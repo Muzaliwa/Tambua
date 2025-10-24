@@ -13,7 +13,8 @@ const MOCK_MOTO_DB: { [key: string]: any } = {
         year: '2023',
         chassis: 'MD625K32L8F12345',
         color: 'ROUGE',
-        qrCode: 'TAMBUA-MOTO-12345'
+        qrCode: 'TAMBUA-MOTO-12345',
+        zone: 'Goma',
     },
     'GOM 789 EF': {
         plate: 'GOM 789 EF',
@@ -23,7 +24,8 @@ const MOCK_MOTO_DB: { [key: string]: any } = {
         year: '2022',
         chassis: 'LPRPCJ-F48975612',
         color: 'NOIRE',
-        qrCode: 'TAMBUA-MOTO-67890'
+        qrCode: 'TAMBUA-MOTO-67890',
+        zone: 'Goma',
     }
 };
 

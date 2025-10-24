@@ -13,6 +13,9 @@ import PrintingPage from './pages/PrintingPage';
 import MotorcyclesPage from './pages/MotorcyclesPage';
 import VehicleDetailPage from './pages/VehicleDetailPage';
 import MotorcycleDetailPage from './pages/MotorcycleDetailPage';
+import AgentsPage from './pages/AgentsPage';
+import AgentDetailPage from './pages/AgentDetailPage';
+import ReportsPage from './pages/ReportsPage';
 
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -37,6 +40,9 @@ const AppRoutes: React.FC = () => {
             <Route path="motorcycles/:id" element={<MotorcycleDetailPage />} />
             <Route path="fines" element={<FinesPage />} />
             <Route path="infractions" element={<InfractionsPage />} />
+            <Route path="agents" element={<AgentsPage />} />
+            <Route path="agents/:id" element={<AgentDetailPage />} />
+            <Route path="reports" element={<ReportsPage />} />
             <Route path="settings" element={<div className="p-4">Settings Page for Admin</div>} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>

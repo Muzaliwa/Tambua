@@ -1,4 +1,5 @@
 import React from 'react';
+import QRCodeGenerator from './QRCodeGenerator';
 
 interface PrintableLicenseProps {
   data: {
@@ -11,17 +12,25 @@ interface PrintableLicenseProps {
     categories: string[];
     photoUrl: string;
     nationality: string;
+    zone: string;
   };
 }
 
 const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div>
-        <p className="text-[6px] uppercase text-gray-500 tracking-wider">{label}</p>
-        <p className="text-[8px] font-bold uppercase">{value}</p>
+        <p className="text-[6px] uppercase text-gray-700 tracking-wider">{label}</p>
+        <p className="text-[8px] font-bold uppercase text-black">{value}</p>
     </div>
 );
 
 const PrintableLicense: React.FC<PrintableLicenseProps> = ({ data }) => {
+  const isExpired = new Date(data.expiryDate) < new Date();
+  const qrCodeData = {
+    type: 'PERMIS_DE_CONDUIRE',
+    status: isExpired ? 'Expiré' : 'Valide',
+    ...data,
+  };
+
   return (
     <div className="printable-area print-card-format">
       <div className="w-[85.6mm] h-[53.98mm] bg-white border border-gray-300 rounded-lg shadow-md p-2 flex flex-col font-sans relative overflow-hidden">
@@ -38,8 +47,8 @@ const PrintableLicense: React.FC<PrintableLicenseProps> = ({ data }) => {
             <div className="w-6 h-6 bg-red-600"></div>
           </div>
           <div className="text-right">
-            <p className="text-[8px] font-bold">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
-            <p className="text-[7px] text-blue-700 font-semibold">PERMIS DE CONDUIRE</p>
+            <p className="text-[8px] font-bold text-black">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
+            <p className="text-[7px] text-black font-semibold">PERMIS DE CONDUIRE</p>
           </div>
         </div>
         
@@ -62,9 +71,14 @@ const PrintableLicense: React.FC<PrintableLicenseProps> = ({ data }) => {
                 <Field label="4b. Expire le" value={new Date(data.expiryDate).toLocaleDateString('fr-FR')} />
             </div>
             <Field label="9. Catégories" value={data.categories.join(', ')} />
+            <Field label="Zone d'émission" value={data.zone} />
           </div>
         </div>
-
+        
+        {/* QR Code */}
+        <div className="absolute bottom-1 right-1 z-20">
+          <QRCodeGenerator data={qrCodeData} size={48} />
+        </div>
       </div>
     </div>
   );

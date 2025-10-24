@@ -60,3 +60,31 @@ export interface Motorcycle {
   documentStatus: ValidityStatus;
   insuranceStatus: ValidityStatus;
 }
+
+export interface Agent {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  registrationsToday: number;
+  finesCollectedToday: number;
+  status: 'Actif' | 'Inactif';
+}
+
+export interface AgentActivity {
+    id: string;
+    date: string;
+    action: 'ENREGISTREMENT_VEHICULE' | 'PAIEMENT_AMENDE' | 'IMPRESSION_PERMIS' | 'ENREGISTREMENT_MOTO';
+    details: string; // e.g., Plate number, Fine ID
+    amount?: number;
+}
+
+// FIX: Added Impression interface for reports page.
+export interface Impression {
+    id: string;
+    documentType: 'Permis' | 'Carte Rose' | 'Attestation';
+    agentName: string;
+    date: string; // ISO string
+    identifier: string; // Plate or License number
+    zone: 'Goma' | 'Bukavu' | 'Kinshasa';
+}

@@ -167,7 +167,7 @@ const LocalPaymentSimulator: React.FC = () => {
               <p className="text-sm font-medium text-gray-700 mb-3">Choisissez un mode de paiement :</p>
               <div className="grid grid-cols-2 gap-3">
                   {PAYMENT_METHODS.map(method => (
-                       <button key={method} onClick={() => setPaymentMethod(method)} className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === method ? 'bg-red-600 text-white border-red-600 ring-2 ring-red-300' : 'bg-white hover:bg-gray-50'}`}>
+                       <button key={method} onClick={() => setPaymentMethod(method)} className={`p-4 border rounded-lg text-center font-semibold transition-colors ${paymentMethod === method ? 'bg-red-600 text-white border-red-600 ring-2 ring-red-300' : 'bg-white text-gray-800 hover:bg-gray-50'}`}>
                           {method}
                        </button>
                   ))}

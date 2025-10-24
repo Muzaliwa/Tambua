@@ -15,6 +15,7 @@ const MOCK_VEHICLE_DB: { [key: string]: any } = {
         chassis: 'JTEHH20V-0045987',
         color: 'VERTE',
         issueDate: '2024-03-18',
+        zone: 'Bukavu',
     },
     'GOM45D': {
         plate: 'GOM45D',
@@ -26,6 +27,7 @@ const MOCK_VEHICLE_DB: { [key: string]: any } = {
         chassis: 'WDD205048-1F45678',
         color: 'BLANCHE',
         issueDate: '2024-05-22',
+        zone: 'Goma',
     }
 };
 

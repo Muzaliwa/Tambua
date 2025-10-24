@@ -1,4 +1,5 @@
 import React from 'react';
+import QRCodeGenerator from './QRCodeGenerator';
 
 interface PrintablePinkCardProps {
   data: {
@@ -11,17 +12,24 @@ interface PrintablePinkCardProps {
     chassis: string;
     color: string;
     issueDate: string;
+    zone: string;
   };
 }
 
 const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div>
-        <p className="text-[6px] uppercase text-gray-500 tracking-wider">{label}</p>
-        <p className="text-[8px] font-bold uppercase font-mono">{value}</p>
+        <p className="text-[6px] uppercase text-gray-700 tracking-wider">{label}</p>
+        <p className="text-[8px] font-bold uppercase font-mono text-black">{value}</p>
     </div>
 );
 
 const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
+  const qrCodeData = {
+    type: 'CARTE_ROSE',
+    status: 'Valide',
+    ...data,
+  };
+  
   return (
     <div className="printable-area print-card-format">
       <div className="w-[85.6mm] h-[53.98mm] bg-pink-50 border border-pink-200 rounded-lg shadow-md p-2 flex flex-col font-sans relative overflow-hidden">
@@ -33,8 +41,8 @@ const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b-2 border-dotted border-pink-300 pb-1 z-10">
           <div className="text-left">
-            <p className="text-[8px] font-bold text-pink-800">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
-            <p className="text-[7px] text-pink-700 font-semibold">CERTIFICAT D'IMMATRICULATION</p>
+            <p className="text-[8px] font-bold text-black">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
+            <p className="text-[7px] text-black font-semibold">CERTIFICAT D'IMMATRICULATION</p>
           </div>
         </div>
         
@@ -48,12 +56,18 @@ const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
                 <Field label="D.3 MODÈLE" value={data.model} />
             </div>
             <Field label="E. N° CHÂSSIS" value={data.chassis} />
-             <div className="grid grid-cols-3 gap-x-2">
+             <div className="grid grid-cols-4 gap-x-2">
                 <Field label="F.1 ANNÉE" value={data.year} />
                 <Field label="J. COULEUR" value={data.color} />
                 <Field label="B. DATE ÉMISSION" value={new Date(data.issueDate).toLocaleDateString('fr-FR')} />
+                <Field label="ZONE" value={data.zone} />
             </div>
           </div>
+        </div>
+
+        {/* QR Code */}
+        <div className="absolute bottom-1 right-1 z-20">
+            <QRCodeGenerator data={qrCodeData} size={48} />
         </div>
       </div>
     </div>

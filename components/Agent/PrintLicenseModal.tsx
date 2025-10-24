@@ -13,8 +13,9 @@ const MOCK_LICENSE_DB: { [key: string]: any } = {
         issueDate: '2023-01-10',
         expiryDate: '2028-01-09',
         categories: ['A', 'B'],
-        photoUrl: 'https://i.pravatar.cc/150?u=jeanluc',
+        photoUrl: 'https://picsum.photos/seed/jeanluc/150/150',
         nationality: 'Congolaise (RDC)',
+        zone: 'Goma',
     }
 };
 
