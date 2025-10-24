@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Infraction } from '../types';
-import { Search, PlusCircle, MoreVertical } from 'lucide-react';
+import { Search, PlusCircle } from 'lucide-react';
 import AddInfractionModal from '../components/Admin/AddInfractionModal';
+import EditInfractionModal from '../components/Admin/EditInfractionModal';
+import ActionMenu from '../components/Admin/ActionMenu';
 
 const mockInfractions: Infraction[] = [
   { id: '3f7d2b8a', code: 'RDC-ENV-021', label: 'Pollution sonore', description: 'Nuisances sonores excessives dépassant les limites autorisées.', severity: 'MOYEN', amount: 75000, createdAt: '2025-10-20T09:02:50.531Z', updatedAt: '2025-10-20T09:02:50.531Z' },
@@ -19,14 +21,15 @@ const SeverityBadge: React.FC<{ severity: Infraction['severity'] }> = ({ severit
         'TRES_GRAVE': 'bg-red-100 text-red-800',
     };
     const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
-    return <span className={`${baseClasses} ${severityClasses[severity]}`}>{severity.replace('_', ' ')}</span>;
+    return <span className={`${baseClasses} ${severityClasses[severity].replace('_', ' ')}`}>{severity.replace('_', ' ')}</span>;
 };
 
 
 const InfractionsPage: React.FC = () => {
   const [infractions, setInfractions] = useState<Infraction[]>(mockInfractions);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingInfraction, setEditingInfraction] = useState<Infraction | null>(null);
 
   const filteredInfractions = useMemo(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
@@ -48,6 +51,17 @@ const InfractionsPage: React.FC = () => {
         updatedAt: new Date().toISOString(),
     };
     setInfractions(prev => [newInfraction, ...prev]);
+  };
+  
+  const handleSaveInfraction = (updatedInfraction: Infraction) => {
+    setInfractions(prev => prev.map(i => i.id === updatedInfraction.id ? updatedInfraction : i));
+    setEditingInfraction(null);
+  };
+
+  const handleDeleteInfraction = (id: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette infraction ?')) {
+        setInfractions(prev => prev.filter(i => i.id !== id));
+    }
   };
 
   return (
@@ -71,7 +85,7 @@ const InfractionsPage: React.FC = () => {
               />
             </div>
             <button 
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsAddModalOpen(true)}
                 className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                 <PlusCircle className="w-5 h-5 mr-2" />
                 Ajouter
@@ -85,7 +99,7 @@ const InfractionsPage: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 {['Code', 'Label', 'Sévérité', 'Montant', 'Actions'].map(header => (
-                  <th key={header} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
                     {header}
                   </th>
                 ))}
@@ -99,9 +113,10 @@ const InfractionsPage: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm"><SeverityBadge severity={infraction.severity} /></td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{infraction.amount.toLocaleString()} CDF</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
+                    <ActionMenu
+                        onEdit={() => setEditingInfraction(infraction)}
+                        onDelete={() => handleDeleteInfraction(infraction.id)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -109,7 +124,8 @@ const InfractionsPage: React.FC = () => {
           </table>
         </div>
       </div>
-      {isModalOpen && <AddInfractionModal onClose={() => setIsModalOpen(false)} onAdd={handleAddInfraction} />}
+      {isAddModalOpen && <AddInfractionModal onClose={() => setIsAddModalOpen(false)} onAdd={handleAddInfraction} />}
+      {editingInfraction && <EditInfractionModal infraction={editingInfraction} onClose={() => setEditingInfraction(null)} onSave={handleSaveInfraction} />}
     </>
   );
 };

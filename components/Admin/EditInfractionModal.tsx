@@ -2,19 +2,14 @@ import React, { useState } from 'react';
 import { Infraction } from '../../types';
 import { ModalHeader, ModalFooter, FormField, FormRow } from '../Agent/AgentFormComponents';
 
-interface AddInfractionModalProps {
+interface EditInfractionModalProps {
   onClose: () => void;
-  onAdd: (newInfraction: Omit<Infraction, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSave: (updatedInfraction: Infraction) => void;
+  infraction: Infraction;
 }
 
-const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd }) => {
-  const [formData, setFormData] = useState({
-    code: '',
-    label: '',
-    description: '',
-    severity: 'LEGER' as Infraction['severity'],
-    amount: 0,
-  });
+const EditInfractionModal: React.FC<EditInfractionModalProps> = ({ onClose, onSave, infraction }) => {
+  const [formData, setFormData] = useState<Infraction>(infraction);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -30,7 +25,7 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
     setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      onAdd(formData);
+      onSave(formData);
       setIsSubmitting(false);
       onClose();
     }, 500);
@@ -40,13 +35,12 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
         <form onSubmit={handleSubmit}>
-          <ModalHeader title="Ajouter une Infraction" onClose={onClose} />
+          <ModalHeader title={`Modifier Infraction: ${infraction.code}`} onClose={onClose} />
           <div className="p-6 space-y-4">
             <FormRow>
               <FormField
                 label="Code de l'infraction"
                 id="code"
-                placeholder="Ex: RDC-SEC-001"
                 value={formData.code}
                 onChange={handleChange}
                 required
@@ -54,7 +48,6 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
               <FormField
                 label="Label"
                 id="label"
-                placeholder="Ex: Excès de vitesse"
                 value={formData.label}
                 onChange={handleChange}
                 required
@@ -66,8 +59,7 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
                 id="description"
                 name="description"
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Description détaillée de l'infraction..."
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900"
                 value={formData.description}
                 onChange={handleChange}
                 required
@@ -81,7 +73,7 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
                   name="severity"
                   value={formData.severity}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900"
                 >
                   <option value="LEGER">Léger</option>
                   <option value="MOYEN">Moyen</option>
@@ -93,18 +85,17 @@ const AddInfractionModal: React.FC<AddInfractionModalProps> = ({ onClose, onAdd 
                 label="Montant de l'amende (CDF)"
                 id="amount"
                 type="number"
-                placeholder="Ex: 50000"
                 value={formData.amount.toString()}
                 onChange={handleChange}
                 required
               />
             </FormRow>
           </div>
-          <ModalFooter onClose={onClose} submitLabel="Ajouter Infraction" isSubmitting={isSubmitting} />
+          <ModalFooter onClose={onClose} submitLabel="Enregistrer" isSubmitting={isSubmitting} />
         </form>
       </div>
     </div>
   );
 };
 
-export default AddInfractionModal;
+export default EditInfractionModal;

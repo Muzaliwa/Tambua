@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Agent } from '../types';
-import { Search, Filter, PlusCircle, MoreVertical } from 'lucide-react';
+import { Search, Filter, PlusCircle } from 'lucide-react';
 import AddAgentModal from '../components/Admin/AddAgentModal';
+import ActionMenu from '../components/Admin/ActionMenu';
 
 // --- MOCK DATA ---
 const mockAgents: Agent[] = [
@@ -28,6 +29,7 @@ const AgentsPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('Tous');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
 
     const filteredAgents = useMemo(() => {
         return agents.filter(agent => {
@@ -43,15 +45,44 @@ const AgentsPage: React.FC = () => {
         });
     }, [searchQuery, statusFilter, agents]);
 
-    const handleAddAgent = (newAgentData: Omit<Agent, 'id' | 'avatar' | 'registrationsToday' | 'finesCollectedToday'>) => {
-        const newAgent: Agent = {
-            ...newAgentData,
-            id: `agent-${Math.random().toString(36).substring(2, 9)}`,
-            avatar: `${newAgentData.name.charAt(0)}${newAgentData.name.split(' ')[1]?.charAt(0) || ''}`.toUpperCase(),
-            registrationsToday: 0,
-            finesCollectedToday: 0,
-        };
-        setAgents(prev => [newAgent, ...prev]);
+    const handleOpenModalForEdit = (agent: Agent) => {
+        setEditingAgent(agent);
+        setIsModalOpen(true);
+    };
+    
+    const handleOpenModalForAdd = () => {
+        setEditingAgent(null);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingAgent(null);
+    };
+
+    const handleSaveAgent = (agentData: Omit<Agent, 'id' | 'avatar' | 'registrationsToday' | 'finesCollectedToday'> & { id?: string }) => {
+        if (editingAgent) {
+            // Update
+            const updatedAgent = { ...editingAgent, ...agentData };
+            setAgents(agents.map(a => a.id === editingAgent.id ? updatedAgent : a));
+        } else {
+            // Add
+            const newAgent: Agent = {
+                ...agentData,
+                id: `agent-${Math.random().toString(36).substring(2, 9)}`,
+                avatar: `${agentData.name.charAt(0)}${agentData.name.split(' ')[1]?.charAt(0) || ''}`.toUpperCase(),
+                registrationsToday: 0,
+                finesCollectedToday: 0,
+            };
+            setAgents(prev => [newAgent, ...prev]);
+        }
+        handleCloseModal();
+    };
+
+    const handleDeleteAgent = (id: string) => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer cet agent ?')) {
+            setAgents(prev => prev.filter(a => a.id !== id));
+        }
     };
 
     return (
@@ -86,7 +117,7 @@ const AgentsPage: React.FC = () => {
                             </select>
                              <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                         </div>
-                        <button onClick={() => setIsModalOpen(true)} className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        <button onClick={handleOpenModalForAdd} className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                             <PlusCircle className="w-5 h-5 mr-2" />
                             Ajouter
                         </button>
@@ -123,9 +154,10 @@ const AgentsPage: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">{agent.finesCollectedToday.toLocaleString()} CDF</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm"><StatusBadge status={agent.status} /></td>
                                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={(e) => { e.stopPropagation(); /* open edit modal */ }} className="text-gray-400 hover:text-gray-600">
-                                            <MoreVertical className="w-5 h-5" />
-                                        </button>
+                                        <ActionMenu
+                                            onEdit={() => handleOpenModalForEdit(agent)}
+                                            onDelete={() => handleDeleteAgent(agent.id)}
+                                        />
                                     </td>
                                 </tr>
                             ))}
@@ -133,7 +165,7 @@ const AgentsPage: React.FC = () => {
                     </table>
                 </div>
             </div>
-            {isModalOpen && <AddAgentModal onClose={() => setIsModalOpen(false)} onAdd={handleAddAgent} />}
+            {isModalOpen && <AddAgentModal agentToEdit={editingAgent} onClose={handleCloseModal} onSave={handleSaveAgent} />}
         </>
     );
 };

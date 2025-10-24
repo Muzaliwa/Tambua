@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Fine, Vehicle, Motorcycle } from '../types';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, FileDown } from 'lucide-react';
+import ActionMenu from '../components/Admin/ActionMenu';
+import EditFineModal from '../components/Admin/EditFineModal';
 
 // --- MOCK DATA ---
 const mockVehicles: Vehicle[] = [
@@ -26,6 +28,13 @@ const mockFines: Fine[] = [
 ];
 // --- END MOCK DATA ---
 
+// Add declaration for jsPDF
+declare global {
+  interface Window {
+    jspdf: any;
+  }
+}
+
 const StatusBadge: React.FC<{ status: Fine['status'] }> = ({ status }) => {
     const statusClasses = {
         'Payée': 'bg-green-100 text-green-800',
@@ -36,37 +45,32 @@ const StatusBadge: React.FC<{ status: Fine['status'] }> = ({ status }) => {
     return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
 };
 
-const ValidityBadge: React.FC<{ status: Vehicle['documentStatus'] }> = ({ status }) => {
-    const statusClasses = {
-        'Valide': 'bg-green-100 text-green-800',
-        'Bientôt expiré': 'bg-yellow-100 text-yellow-800',
-        'Expiré': 'bg-red-100 text-red-800',
-    };
-    const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
-    return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
+type EnrichedFine = Fine & {
+    ownerPhoto: string;
+    vehicleId?: string;
+    motorcycleId?: string;
 };
-
 
 const FinesPage: React.FC = () => {
     const navigate = useNavigate();
+    const [fines, setFines] = useState<Fine[]>(mockFines);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('Tous');
+    const [editingFine, setEditingFine] = useState<Fine | null>(null);
 
     const enrichedFines = useMemo(() => {
-        return mockFines.map(fine => {
+        return fines.map(fine => {
             const vehicle = mockVehicles.find(v => v.plate === fine.plate);
             const motorcycle = mockMotorcycles.find(m => m.plate === fine.plate);
             const ownerInfo = vehicle || motorcycle;
             return {
                 ...fine,
                 ownerPhoto: ownerInfo?.photo || 'https://picsum.photos/seed/placeholder/150/150',
-                documentStatus: ownerInfo?.documentStatus || 'Valide',
-                insuranceStatus: ownerInfo?.insuranceStatus || 'Valide',
                 vehicleId: vehicle?.id,
                 motorcycleId: motorcycle?.id,
             };
         });
-    }, []);
+    }, [fines]);
 
     const filteredFines = useMemo(() => {
         const lowerCaseQuery = searchQuery.toLowerCase();
@@ -82,8 +86,19 @@ const FinesPage: React.FC = () => {
             return matchesSearch && matchesStatus;
         });
     }, [searchQuery, statusFilter, enrichedFines]);
+    
+    const handleDelete = (id: string) => {
+        if(window.confirm("Êtes-vous sûr de vouloir supprimer cette amende ?")) {
+            setFines(prev => prev.filter(f => f.id !== id));
+        }
+    };
+    
+    const handleSave = (updatedFine: Fine) => {
+        setFines(prev => prev.map(f => f.id === updatedFine.id ? updatedFine : f));
+        setEditingFine(null);
+    };
 
-    const handleRowClick = (fine: typeof filteredFines[0]) => {
+    const handleRowClick = (fine: EnrichedFine) => {
         if (fine.vehicleId) {
             navigate(`/vehicles/${fine.vehicleId}`);
         } else if (fine.motorcycleId) {
@@ -92,79 +107,128 @@ const FinesPage: React.FC = () => {
             console.warn(`Aucun dossier trouvé pour la plaque : ${fine.plate}`);
         }
     };
+    
+    const exportToPdf = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const title = "Rapport des Amendes";
+        const date = new Date().toLocaleDateString('fr-FR');
+        doc.text(`${title} - ${date}`, 14, 15);
+
+        const tableColumn = ['Propriétaire', 'Plaque', 'Motif', 'Montant', 'Statut Amende'];
+        const tableRows: (string|number)[][] = [];
+
+        filteredFines.forEach(fine => {
+            const fineData = [
+                fine.driver,
+                fine.plate,
+                fine.reason,
+                `${fine.amount.toLocaleString()} ${fine.currency}`,
+                fine.status,
+            ];
+            tableRows.push(fineData);
+        });
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+            theme: 'grid',
+        });
+        
+        doc.save(`rapport_amendes_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-            {/* Header */}
-            <div className="flex flex-wrap items-center justify-between mb-6 border-b pb-4">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-800">Gestion des Amendes</h1>
-                    <p className="text-sm text-gray-500">Liste de toutes les amendes enregistrées.</p>
-                </div>
-                <div className="flex items-center space-x-4 mt-4 md:mt-0">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher (plaque, conducteur...)"
-                            className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+        <>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+                {/* Header */}
+                <div className="flex flex-wrap items-center justify-between mb-6 border-b pb-4">
+                    <div>
+                        <h1 className="text-xl font-bold text-gray-800">Gestion des Amendes</h1>
+                        <p className="text-sm text-gray-500">Liste de toutes les amendes enregistrées.</p>
                     </div>
-                    <div className="relative">
-                        <select
-                            className="appearance-none pl-4 pr-10 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 text-sm"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="Tous">Tous les statuts</option>
-                            <option value="Payée">Payée</option>
-                            <option value="En attente">En attente</option>
-                            <option value="En retard">En retard</option>
-                        </select>
-                         <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <div className="flex items-center space-x-2 mt-4 md:mt-0">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Rechercher (plaque, conducteur...)"
+                                className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <div className="relative">
+                            <select
+                                className="appearance-none pl-4 pr-10 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 text-sm"
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                            >
+                                <option value="Tous">Tous les statuts</option>
+                                <option value="Payée">Payée</option>
+                                <option value="En attente">En attente</option>
+                                <option value="En retard">En retard</option>
+                            </select>
+                             <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        </div>
+                        <button onClick={exportToPdf} className="flex items-center px-4 py-2 text-sm font-semibold text-red-700 bg-red-100 rounded-lg hover:bg-red-200">
+                            <FileDown className="w-5 h-5 mr-2" />
+                            PDF
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            {['Propriétaire', 'Plaque', 'Motif', 'Statut Documents', 'Statut Assurance', 'Montant', 'Statut Amende'].map(header => (
-                                <th key={header} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {header}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredFines.map((fine) => (
-                            <tr key={fine.id} onClick={() => handleRowClick(fine)} className="hover:bg-gray-50 cursor-pointer">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0 h-10 w-10">
-                                            <img className="h-10 w-10 rounded-full object-cover" src={fine.ownerPhoto} alt={fine.driver} />
-                                        </div>
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-gray-900">{fine.driver}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">{fine.plate}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{fine.reason}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm"><ValidityBadge status={fine.documentStatus} /></td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm"><ValidityBadge status={fine.insuranceStatus} /></td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">{fine.amount.toLocaleString()} {fine.currency}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm"><StatusBadge status={fine.status} /></td>
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                {['Propriétaire', 'Plaque', 'Motif', 'Montant', 'Statut Amende', 'Actions'].map(header => (
+                                    <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
+                                        {header}
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {filteredFines.map((fine) => (
+                                <tr key={fine.id} onClick={() => handleRowClick(fine)} className="hover:bg-gray-50 cursor-pointer">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center">
+                                            <div className="flex-shrink-0 h-10 w-10">
+                                                <img className="h-10 w-10 rounded-full object-cover" src={fine.ownerPhoto} alt={fine.driver} />
+                                            </div>
+                                            <div className="ml-4">
+                                                <div className="text-sm font-medium text-gray-900">{fine.driver}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">{fine.plate}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{fine.reason}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-semibold">{fine.amount.toLocaleString()} {fine.currency}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm"><StatusBadge status={fine.status} /></td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <ActionMenu
+                                            onEdit={() => setEditingFine(fine)}
+                                            onDelete={() => handleDelete(fine.id)}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+            {editingFine && (
+                <EditFineModal
+                    fine={editingFine}
+                    onClose={() => setEditingFine(null)}
+                    onSave={handleSave}
+                />
+            )}
+        </>
     );
 };
 
