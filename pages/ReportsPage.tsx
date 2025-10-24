@@ -150,8 +150,71 @@ const ReportsPage: React.FC = () => {
         }
     }, [generatedData, reportType, period]);
     
-    const exportToPdf = () => { /* PDF export logic */ };
-    const exportToCsv = () => { /* CSV export logic */ };
+    const exportToPdf = () => {
+        if (!generatedData || generatedData.length === 0) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const title = reportType === 'fines' ? 'Rapport des Amendes' : 'Rapport des Impressions';
+        const date = new Date().toISOString().split('T')[0];
+        const filename = `rapport_${reportType}_${date}.pdf`;
+
+        doc.text(title, 14, 15);
+
+        let head: string[][] = [];
+        let body: (string|number)[][] = [];
+
+        if (reportType === 'fines') {
+            head = [['Date', 'Plaque', 'Motif', 'Montant', 'Statut', 'Zone']];
+            const finesData = generatedData as (Fine & { zone: string })[];
+            body = finesData.map(item => [
+                new Date(item.date).toLocaleDateString(),
+                item.plate,
+                item.reason,
+                `${item.amount.toLocaleString()} ${item.currency}`,
+                item.status,
+                item.zone
+            ]);
+        } else {
+            head = [['Date', 'Type', 'Identifiant', 'Agent', 'Zone']];
+            const printsData = generatedData as Impression[];
+            body = printsData.map(item => [
+                new Date(item.date).toLocaleDateString(),
+                item.documentType,
+                item.identifier,
+                item.agentName,
+                item.zone
+            ]);
+        }
+
+        doc.autoTable({
+            head: head,
+            body: body,
+            startY: 20,
+            theme: 'grid',
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [22, 160, 133] },
+        });
+
+        doc.save(filename);
+    };
+
+    const exportToCsv = () => {
+        if (!generatedData || generatedData.length === 0 || !window.Papa) return;
+
+        const csv = window.Papa.unparse(generatedData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        const date = new Date().toISOString().split('T')[0];
+        link.setAttribute("download", `rapport_${reportType}_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <div className="space-y-8">

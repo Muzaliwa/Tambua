@@ -4,32 +4,28 @@ import { ModalHeader, ModalFooter, FormField, FormRow } from '../Agent/AgentForm
 
 interface AddAgentModalProps {
   onClose: () => void;
-  onAdd: (newAgentData: Omit<Agent, 'id' | 'avatar' | 'registrationsToday' | 'finesCollectedToday' | 'status'>) => void;
+  onAdd: (newAgent: Omit<Agent, 'id' | 'avatar' | 'registrationsToday' | 'finesCollectedToday'>) => void;
 }
 
 const AddAgentModal: React.FC<AddAgentModalProps> = ({ onClose, onAdd }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
+    status: 'Actif' as Agent['status'],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password) {
-        alert("Veuillez remplir tous les champs.");
-        return;
-    }
     setIsSubmitting(true);
     // Simulate API call
     setTimeout(() => {
-      onAdd({ name: formData.name, email: formData.email });
+      onAdd(formData);
       setIsSubmitting(false);
       onClose();
     }, 500);
@@ -39,12 +35,12 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ onClose, onAdd }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-lg w-full">
         <form onSubmit={handleSubmit}>
-          <ModalHeader title="Ajouter un nouvel Agent" onClose={onClose} />
+          <ModalHeader title="Ajouter un Agent" onClose={onClose} />
           <div className="p-6 space-y-4">
             <FormField
               label="Nom complet"
               id="name"
-              placeholder="Ex: Jean Dupont"
+              placeholder="Ex: John Doe"
               value={formData.name}
               onChange={handleChange}
               required
@@ -54,24 +50,28 @@ const AddAgentModal: React.FC<AddAgentModalProps> = ({ onClose, onAdd }) => {
               label="Adresse e-mail"
               id="email"
               type="email"
-              placeholder="Ex: j.dupont@tambua.com"
+              placeholder="Ex: john.doe@tambua.com"
               value={formData.email}
               onChange={handleChange}
               required
               fullWidth
             />
-            <FormField
-              label="Mot de passe temporaire"
-              id="password"
-              type="password"
-              placeholder="Créez un mot de passe sécurisé"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
+            <div>
+              <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="Actif">Actif</option>
+                <option value="Inactif">Inactif</option>
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 pt-2">Un mot de passe temporaire sera envoyé à l'adresse e-mail de l'agent.</p>
           </div>
-          <ModalFooter onClose={onClose} submitLabel="Ajouter l'Agent" isSubmitting={isSubmitting} />
+          <ModalFooter onClose={onClose} submitLabel="Ajouter Agent" isSubmitting={isSubmitting} />
         </form>
       </div>
     </div>
