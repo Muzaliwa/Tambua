@@ -26,6 +26,20 @@
 }
 </script>
 <style>
+  :root {
+    --brand-50: #f4fbfd;
+    --brand-100: #e6f7fb;
+    --brand-300: #8fd8ef;
+    --brand-400: #07A6E0;
+    --brand-600: #0F6D72;
+    --brand-800: #07363a;
+    --accent-blue: #0b5e9b;
+    --accent-indigo: #7C3AED;
+    --accent-pink: #ff6fb1;
+    --text-main: var(--brand-800);
+    --text-muted: #526a6c;
+  }
+
   @media print {
     body * {
       visibility: hidden;
@@ -78,11 +92,11 @@
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
       -webkit-box-shadow: 0 0 0 30px white inset !important;
-      -webkit-text-fill-color: #111827 !important; /* text-gray-900 */
+      -webkit-text-fill-color: var(--text-main) !important;
   }
 </style>
 </head>
-  <body class="bg-gray-50">
+  <body class="bg-[--brand-50]">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

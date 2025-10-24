@@ -15,9 +15,9 @@ const mockInfractions: Infraction[] = [
 
 const SeverityBadge: React.FC<{ severity: Infraction['severity'] }> = ({ severity }) => {
     const severityClasses = {
-        'LEGER': 'bg-blue-100 text-blue-800',
+        'LEGER': 'bg-blue-100 text-[--accent-blue]',
         'MOYEN': 'bg-yellow-100 text-yellow-800',
-        'GRAVE': 'bg-orange-100 text-orange-800',
+        'GRAVE': 'bg-pink-100 text-[--accent-pink]',
         'TRES_GRAVE': 'bg-red-100 text-red-800',
     };
     const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
@@ -66,12 +66,12 @@ const InfractionsPage: React.FC = () => {
 
   return (
     <>
-      <div className="bg-white p-6 rounded-lg shadow-sm">
+      <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between mb-6 border-b pb-4">
+        <div className="flex flex-wrap items-center justify-between mb-6 border-b border-black/5 pb-4">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Gestion des Infractions</h1>
-            <p className="text-sm text-gray-500">Liste des infractions et leurs barèmes.</p>
+            <h1 className="text-xl font-bold text-[--text-main]">Gestion des Infractions</h1>
+            <p className="text-sm text-[--text-muted]">Liste des infractions et leurs barèmes.</p>
           </div>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <div className="relative">
@@ -79,14 +79,14 @@ const InfractionsPage: React.FC = () => {
               <input 
                 type="text" 
                 placeholder="Rechercher (label, code...)" 
-                className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400"
+                className="pl-10 pr-4 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] placeholder:text-gray-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow">
                 <PlusCircle className="w-5 h-5 mr-2" />
                 Ajouter
             </button>
@@ -95,23 +95,23 @@ const InfractionsPage: React.FC = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-black/5">
+            <thead className="bg-brand-50/50">
               <tr>
                 {['Code', 'Label', 'Sévérité', 'Montant', 'Actions'].map(header => (
-                  <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
+                  <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-[--text-muted] uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-black/5">
               {filteredInfractions.map((infraction) => (
-                <tr key={infraction.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">{infraction.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{infraction.label}</td>
+                <tr key={infraction.id} className="hover:bg-brand-50/50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[--text-muted]">{infraction.code}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[--text-main]">{infraction.label}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm"><SeverityBadge severity={infraction.severity} /></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">{infraction.amount.toLocaleString()} CDF</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[--text-main]">{infraction.amount.toLocaleString()} CDF</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <ActionMenu
                         onEdit={() => setEditingInfraction(infraction)}

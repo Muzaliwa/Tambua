@@ -17,13 +17,13 @@ interface ActionCardProps {
 const ActionCard: React.FC<ActionCardProps> = ({ title, description, icon: Icon, color, onClick }) => (
   <button 
     onClick={onClick}
-    className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-left w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5 hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 text-left w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-400]"
   >
     <div className={`p-3 rounded-full inline-block mb-4`} style={{ backgroundColor: `${color}20`}}>
       <Icon className="w-8 h-8" style={{ color: color }} />
     </div>
-    <h3 className="text-lg font-bold text-gray-800 mb-2">{title}</h3>
-    <p className="text-sm text-gray-500">{description}</p>
+    <h3 className="text-lg font-bold text-[--text-main] mb-2">{title}</h3>
+    <p className="text-sm text-[--text-muted]">{description}</p>
   </button>
 );
 
@@ -47,13 +47,13 @@ const StatItem: React.FC<StatItemProps> = ({ label, value, icon: Icon, color = '
   const selectedColor = colorClasses[color] || colorClasses.blue;
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg flex items-start">
+    <div className="bg-brand-50/60 p-4 rounded-lg flex items-start">
       <div className={`p-3 rounded-full mr-4 ${selectedColor.bg}`}>
         <Icon className={`w-6 h-6 ${selectedColor.text}`} />
       </div>
       <div>
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className="text-xl font-bold text-gray-800">{value}</p>
+        <p className="text-sm text-[--text-muted]">{label}</p>
+        <p className="text-xl font-bold text-[--text-main]">{value}</p>
       </div>
     </div>
   );
@@ -67,7 +67,7 @@ const AgentDashboardPage: React.FC = () => {
   const [isLicenseModalOpen, setLicenseModalOpen] = useState(false);
 
   const actions = [
-    { title: 'Enregistrer un Véhicule', description: 'Ajouter une nouvelle voiture au système.', icon: Car, color: '#3B82F6', action: () => setVehicleModalOpen(true) },
+    { title: 'Enregistrer un Véhicule', description: 'Ajouter une nouvelle voiture au système.', icon: Car, color: 'var(--brand-400)', action: () => setVehicleModalOpen(true) },
     { title: 'Enregistrer une Moto', description: 'Ajouter une nouvelle moto au système.', icon: Bike, color: '#10B981', action: () => setMotorcycleModalOpen(true) },
     { title: 'Demande de Permis', description: 'Enregistrer une nouvelle demande de permis de conduire.', icon: UserPlus, color: '#F59E0B', action: () => setLicenseModalOpen(true) },
     { title: 'Payer une Amende', description: 'Faciliter le paiement des amendes pour les citoyens.', icon: CircleDollarSign, color: '#EF4444', action: () => navigate('/local-payment-simulator') },
@@ -92,8 +92,8 @@ const AgentDashboardPage: React.FC = () => {
       <div>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Portail Agent</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-[--text-main]">Portail Agent</h1>
+          <p className="text-sm text-[--text-muted]">
             Bienvenue, {user?.name}. Gérez les enregistrements et les paiements ici.
           </p>
         </div>
@@ -106,8 +106,8 @@ const AgentDashboardPage: React.FC = () => {
         </div>
 
         {/* Recent Activity Section */}
-        <div className="mt-12 bg-white p-6 rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Rapport d'Activité Journalier</h2>
+        <div className="mt-12 bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
+          <h2 className="text-lg font-semibold text-[--text-main] mb-4">Rapport d'Activité Journalier</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <StatItem icon={Car} label="Véhicules enregistrés" value={agentReportData.vehicleRegistrations} color="blue" />
             <StatItem icon={Bike} label="Motos enregistrées" value={agentReportData.motorcycleRegistrations} color="green" />
@@ -126,12 +126,12 @@ const AgentDashboardPage: React.FC = () => {
               color="indigo"
             />
           </div>
-          <div className="mt-6 border-t pt-4">
-              <h3 className="text-md font-semibold text-gray-700 mb-3">Détail des impressions</h3>
+          <div className="mt-6 border-t border-black/5 pt-4">
+              <h3 className="text-md font-semibold text-[--text-muted] mb-3">Détail des impressions</h3>
               <div className="flex flex-wrap gap-4 text-sm">
-                  <span className="bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full">Permis: <span className="font-bold ml-1">{agentReportData.prints.permis}</span></span>
-                  <span className="bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full">Cartes Roses: <span className="font-bold ml-1">{agentReportData.prints.carteRose}</span></span>
-                  <span className="bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full">Attestations Motard: <span className="font-bold ml-1">{agentReportData.prints.attestationMotard}</span></span>
+                  <span className="bg-brand-100 text-[--text-main] px-3 py-1.5 rounded-full">Permis: <span className="font-bold ml-1">{agentReportData.prints.permis}</span></span>
+                  <span className="bg-brand-100 text-[--text-main] px-3 py-1.5 rounded-full">Cartes Roses: <span className="font-bold ml-1">{agentReportData.prints.carteRose}</span></span>
+                  <span className="bg-brand-100 text-[--text-main] px-3 py-1.5 rounded-full">Attestations Motard: <span className="font-bold ml-1">{agentReportData.prints.attestationMotard}</span></span>
               </div>
           </div>
         </div>

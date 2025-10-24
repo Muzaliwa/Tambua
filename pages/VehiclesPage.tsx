@@ -24,9 +24,9 @@ declare global {
 
 const ValidityBadge: React.FC<{ status: Vehicle['documentStatus'] }> = ({ status }) => {
     const statusClasses = {
-        'Valide': 'bg-green-100 text-green-800',
-        'Bientôt expiré': 'bg-yellow-100 text-yellow-800',
-        'Expiré': 'bg-red-100 text-red-800',
+        'Valide': 'bg-[#1f8a3a] text-white',
+        'Bientôt expiré': 'bg-[#f59e0b] text-white',
+        'Expiré': 'bg-[#dc2626] text-white',
     };
     const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
     return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
@@ -101,12 +101,12 @@ const VehiclesPage: React.FC = () => {
 
     return (
         <>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
                 {/* Header */}
-                <div className="flex flex-wrap items-center justify-between mb-6 border-b pb-4">
+                <div className="flex flex-wrap items-center justify-between mb-6 border-b border-black/5 pb-4">
                     <div>
-                        <h1 className="text-xl font-bold text-gray-800">Gestion des Voitures</h1>
-                        <p className="text-sm text-gray-500">Liste de toutes les voitures enregistrées.</p>
+                        <h1 className="text-xl font-bold text-[--text-main]">Gestion des Voitures</h1>
+                        <p className="text-sm text-[--text-muted]">Liste de toutes les voitures enregistrées.</p>
                     </div>
                      <div className="flex items-center space-x-2 mt-4 md:mt-0">
                         <div className="relative">
@@ -114,14 +114,14 @@ const VehiclesPage: React.FC = () => {
                             <input
                                 type="text"
                                 placeholder="Rechercher (plaque, propriétaire...)"
-                                className="pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400"
+                                className="pl-10 pr-4 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] placeholder:text-gray-400"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                         <div className="relative">
                             <select
-                                className="appearance-none pl-4 pr-10 py-2 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-gray-900 text-sm"
+                                className="appearance-none pl-4 pr-10 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] text-sm"
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
@@ -132,11 +132,11 @@ const VehiclesPage: React.FC = () => {
                             </select>
                              <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                         </div>
-                        <button onClick={exportToPdf} className="flex items-center px-4 py-2 text-sm font-semibold text-red-700 bg-red-100 rounded-lg hover:bg-red-200">
+                        <button onClick={exportToPdf} className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 hover:shadow-lg rounded-lg transition-shadow">
                             <FileDown className="w-5 h-5 mr-2" />
                             PDF
                         </button>
-                        <button className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        <button className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow">
                             <PlusCircle className="w-5 h-5 mr-2" />
                             Ajouter
                         </button>
@@ -145,32 +145,38 @@ const VehiclesPage: React.FC = () => {
 
                 {/* Table */}
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-black/5">
+                        <thead className="bg-brand-50/50">
                             <tr>
                                 {['Propriétaire', 'Plaque', 'Modèle', 'Statut Documents', 'Statut Assurance', 'Actions'].map(header => (
-                                    <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
+                                    <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-[--text-muted] uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
                                         {header}
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-black/5">
                             {filteredVehicles.map((vehicle) => (
-                                <tr key={vehicle.id} onClick={() => navigate(`/vehicles/${vehicle.id}`)} className="hover:bg-gray-50 cursor-pointer">
+                                <tr 
+                                    key={vehicle.id} 
+                                    onClick={() => navigate(`/vehicles/${vehicle.id}`)} 
+                                    className="hover:bg-brand-50/50 cursor-pointer rounded-lg transition-all"
+                                    tabIndex={0}
+                                    onKeyPress={(e) => e.key === 'Enter' && navigate(`/vehicles/${vehicle.id}`)}
+                                >
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="flex-shrink-0 h-10 w-10">
                                                 <img className="h-10 w-10 rounded-full object-cover" src={vehicle.photo} alt={vehicle.owner} />
                                             </div>
                                             <div className="ml-4">
-                                                <div className="text-sm font-medium text-gray-900">{vehicle.owner}</div>
-                                                <div className="text-sm text-gray-500">{vehicle.address}</div>
+                                                <div className="text-sm font-medium text-[--text-main]">{vehicle.owner}</div>
+                                                <div className="text-sm text-[--text-muted]">{vehicle.address}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-600">{vehicle.plate}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{vehicle.makeModel}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[--text-muted]">{vehicle.plate}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[--text-main]">{vehicle.makeModel}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm"><ValidityBadge status={vehicle.documentStatus} /></td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm"><ValidityBadge status={vehicle.insuranceStatus} /></td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

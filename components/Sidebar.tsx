@@ -26,10 +26,10 @@ const Sidebar: React.FC = () => {
   const navItems = user?.role === 'Superviseur' ? adminNavItems : agentNavItems;
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-white text-gray-700 shadow-md">
-      <div className="flex items-center justify-center h-20 border-b">
-        <div className="text-2xl font-bold text-blue-600">
-          <span className="bg-blue-600 text-white rounded-md px-2 py-1 text-3xl">T</span>
+    <aside className="hidden md:flex flex-col w-64 bg-[--brand-800] text-brand-100 shadow-lg">
+      <div className="flex items-center justify-center h-20 border-b border-brand-600/50">
+        <div className="text-2xl font-bold text-white">
+          <span className="bg-brand-50 text-[--brand-400] rounded-md px-2 py-1 text-3xl">T</span>
           ambua
         </div>
       </div>
@@ -42,8 +42,8 @@ const Sidebar: React.FC = () => {
                 className={({ isActive }) =>
                   `flex items-center px-4 py-3 my-1 rounded-lg transition-colors duration-200 ${
                     isActive
-                      ? 'bg-blue-100 text-blue-600 font-semibold'
-                      : 'hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-[--brand-600] text-white font-semibold'
+                      : 'hover:bg-[--brand-600]/60 hover:text-white'
                   }`
                 }
               >

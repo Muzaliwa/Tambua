@@ -48,7 +48,7 @@ const generateChartData = (period: Period) => {
     }
 };
 
-const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#6366F1'];
+const COLORS = ['var(--brand-400)', 'var(--brand-600)', 'var(--accent-blue)', 'var(--accent-pink)'];
 
 const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
@@ -59,8 +59,8 @@ const DashboardPage: React.FC = () => {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-800">Tableau de bord Superviseur</h1>
-                <p className="text-sm text-gray-500">Vue d'ensemble du système et performances.</p>
+                <h1 className="text-2xl font-bold text-[--text-main]">Tableau de bord Superviseur</h1>
+                <p className="text-sm text-[--text-muted]">Vue d'ensemble du système et performances.</p>
             </div>
 
             {/* Stats Grid */}
@@ -72,16 +72,16 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* Charts Section */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
+            <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold text-gray-800">Analyse & Rapports</h2>
-                    <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
+                    <h2 className="text-lg font-semibold text-[--text-main]">Analyse & Rapports</h2>
+                    <div className="flex items-center space-x-1 bg-brand-100 p-1 rounded-lg">
                         {(['weekly', 'monthly', 'quarterly'] as const).map((p) => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
                                 className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${
-                                    period === p ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:bg-gray-200'
+                                    period === p ? 'bg-white text-[--brand-600] shadow-sm' : 'text-[--text-muted] hover:bg-white/50'
                                 }`}
                             >
                                 {p === 'weekly' ? 'Semaine' : p === 'monthly' ? 'Mois' : 'Trimestre'}
@@ -92,20 +92,20 @@ const DashboardPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                     <div className="lg:col-span-3">
-                        <h3 className="text-md font-semibold text-gray-700 mb-2">Revenus des amendes</h3>
+                        <h3 className="text-md font-semibold text-[--text-muted] mb-2">Revenus des amendes</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <LineChart data={chartData.lineData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                <YAxis tick={{ fontSize: 12 }} tickFormatter={(value: number) => `${(value / 1000)}k`} />
+                                <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
+                                <YAxis tick={{ fontSize: 12, fill: 'var(--text-muted)' }} tickFormatter={(value: number) => `${(value / 1000)}k`} />
                                 <Tooltip formatter={(value: number) => [`${value.toLocaleString()} CDF`, "Revenus"]} />
                                 <Legend wrapperStyle={{ fontSize: '14px' }} />
-                                <Line type="monotone" dataKey="Revenus" stroke="#3B82F6" strokeWidth={2} activeDot={{ r: 8 }} />
+                                <Line type="monotone" dataKey="Revenus" stroke="var(--brand-400)" strokeWidth={2} activeDot={{ r: 8 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>
                     <div className="lg:col-span-2">
-                        <h3 className="text-md font-semibold text-gray-700 mb-2">Types d'infractions</h3>
+                        <h3 className="text-md font-semibold text-[--text-muted] mb-2">Types d'infractions</h3>
                          <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie
@@ -118,7 +118,7 @@ const DashboardPage: React.FC = () => {
                                     dataKey="value"
                                     nameKey="name"
                                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                                    labelStyle={{ fontSize: '12px' }}
+                                    labelStyle={{ fontSize: '12px', fill: 'var(--text-main)' }}
                                 >
                                     {chartData.pieData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

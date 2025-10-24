@@ -34,20 +34,20 @@ const mockImpressions: Impression[] = [
 // END MOCK DATA
 
 const StatCard: React.FC<{title: string, value: string | number, icon: React.ElementType}> = ({ title, value, icon: Icon }) => (
-    <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+    <div className="bg-brand-50/60 p-4 rounded-lg">
         <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-full mr-4">
-                <Icon className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-brand-100 rounded-full mr-4">
+                <Icon className="w-6 h-6 text-[--brand-400]" />
             </div>
             <div>
-                <p className="text-sm font-medium text-gray-500">{title}</p>
-                <p className="text-2xl font-bold text-gray-900">{value}</p>
+                <p className="text-sm font-medium text-[--text-muted]">{title}</p>
+                <p className="text-2xl font-bold text-[--text-main]">{value}</p>
             </div>
         </div>
     </div>
 );
 
-const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
+const CHART_COLORS = ['var(--brand-400)', 'var(--brand-600)', 'var(--accent-blue)', 'var(--accent-pink)', '#10B981'];
 
 const ReportsPage: React.FC = () => {
     const [reportType, setReportType] = useState<'fines' | 'prints'>('fines');
@@ -194,7 +194,7 @@ const ReportsPage: React.FC = () => {
             startY: 20,
             theme: 'grid',
             styles: { fontSize: 8 },
-            headStyles: { fillColor: [22, 160, 133] },
+            headStyles: { fillColor: [7, 166, 224] },
         });
 
         doc.save(filename);
@@ -219,27 +219,27 @@ const ReportsPage: React.FC = () => {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-bold text-gray-800">Générateur de Rapports</h1>
-                <p className="text-sm text-gray-500">Configurez et exportez des rapports détaillés.</p>
+                <h1 className="text-2xl font-bold text-[--text-main]">Générateur de Rapports</h1>
+                <p className="text-sm text-[--text-muted]">Configurez et exportez des rapports détaillés.</p>
             </div>
 
             {/* Configuration Section */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center mb-4 border-b pb-3">
-                    <SlidersHorizontal className="w-5 h-5 text-gray-600 mr-3" />
-                    <h2 className="text-lg font-semibold text-gray-800">Configuration</h2>
+            <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
+                <div className="flex items-center mb-4 border-b border-black/5 pb-3">
+                    <SlidersHorizontal className="w-5 h-5 text-[--text-muted] mr-3" />
+                    <h2 className="text-lg font-semibold text-[--text-main]">Configuration</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                     <div>
-                        <label htmlFor="reportType" className="block text-sm font-medium text-gray-700 mb-1">Type de rapport</label>
-                        <select id="reportType" name="reportType" value={reportType} onChange={(e) => setReportType(e.target.value as any)} className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                        <label htmlFor="reportType" className="block text-sm font-medium text-[--text-muted] mb-1">Type de rapport</label>
+                        <select id="reportType" name="reportType" value={reportType} onChange={(e) => setReportType(e.target.value as any)} className="w-full px-3 py-2 bg-white border border-black/10 rounded-md shadow-sm text-sm text-[--text-main] focus:ring-[--brand-400] focus:border-[--brand-400]">
                             <option value="fines">Amendes</option>
                             <option value="prints">Impressions</option>
                         </select>
                     </div>
                     <div>
-                         <label htmlFor="period" className="block text-sm font-medium text-gray-700 mb-1">Période</label>
-                        <select id="period" name="period" value={period} onChange={(e) => setPeriod(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                         <label htmlFor="period" className="block text-sm font-medium text-[--text-muted] mb-1">Période</label>
+                        <select id="period" name="period" value={period} onChange={(e) => setPeriod(e.target.value)} className="w-full px-3 py-2 bg-white border border-black/10 rounded-md shadow-sm text-sm text-[--text-main] focus:ring-[--brand-400] focus:border-[--brand-400]">
                             <option value="daily">Journalier</option>
                             <option value="weekly">Hebdomadaire</option>
                             <option value="monthly">Mensuel</option>
@@ -249,15 +249,15 @@ const ReportsPage: React.FC = () => {
                         </select>
                     </div>
                     <div>
-                         <label htmlFor="zone" className="block text-sm font-medium text-gray-700 mb-1">Zone</label>
-                        <select id="zone" name="zone" value={zone} onChange={(e) => setZone(e.target.value)} className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm text-gray-900 focus:ring-blue-500 focus:border-blue-500">
+                         <label htmlFor="zone" className="block text-sm font-medium text-[--text-muted] mb-1">Zone</label>
+                        <select id="zone" name="zone" value={zone} onChange={(e) => setZone(e.target.value)} className="w-full px-3 py-2 bg-white border border-black/10 rounded-md shadow-sm text-sm text-[--text-main] focus:ring-[--brand-400] focus:border-[--brand-400]">
                             <option value="all">Toutes les zones</option>
                             <option value="Goma">Goma</option>
                             <option value="Bukavu">Bukavu</option>
                             <option value="Kinshasa">Kinshasa</option>
                         </select>
                     </div>
-                    <button onClick={handleGenerateReport} disabled={isLoading} className="w-full md:w-auto flex items-center justify-center px-6 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-400">
+                    <button onClick={handleGenerateReport} disabled={isLoading} className="w-full md:w-auto flex items-center justify-center px-6 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow disabled:opacity-70">
                         {isLoading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : <FileText className="w-5 h-5 mr-2" />}
                         {isLoading ? 'Génération...' : 'Générer'}
                     </button>
@@ -266,17 +266,17 @@ const ReportsPage: React.FC = () => {
 
             {/* Results Section */}
             {generatedData && summaryStats && chartData && (
-                <div className="bg-white p-6 rounded-lg shadow-sm space-y-8">
-                    <div className="flex flex-wrap justify-between items-center border-b pb-3">
-                         <h2 className="text-lg font-semibold text-gray-800">Résultats du Rapport</h2>
+                <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5 space-y-8">
+                    <div className="flex flex-wrap justify-between items-center border-b border-black/5 pb-3">
+                         <h2 className="text-lg font-semibold text-[--text-main]">Résultats du Rapport</h2>
                          <div className="flex items-center space-x-2">
-                             <button onClick={exportToPdf} className="flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-md hover:bg-red-200"><FileDown className="w-4 h-4 mr-2" /> PDF</button>
-                             <button onClick={exportToCsv} className="flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-md hover:bg-green-200"><FileDown className="w-4 h-4 mr-2" /> CSV</button>
+                             <button onClick={exportToPdf} className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:shadow-lg rounded-md transition-shadow"><FileDown className="w-4 h-4 mr-2" /> PDF</button>
+                             <button onClick={exportToCsv} className="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-green-600 hover:shadow-lg rounded-md transition-shadow"><FileDown className="w-4 h-4 mr-2" /> CSV</button>
                          </div>
                     </div>
                     
                     <section>
-                        <h3 className="text-md font-semibold text-gray-700 mb-4">Vue d'ensemble</h3>
+                        <h3 className="text-md font-semibold text-[--text-muted] mb-4">Vue d'ensemble</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {Object.entries(summaryStats).map(([title, value]) => <StatCard key={title} title={title} value={String(value)} icon={ListChecks} />)}
                         </div>
@@ -284,16 +284,16 @@ const ReportsPage: React.FC = () => {
 
                     {chartData.lineChartData.length > 0 && (
                         <section>
-                            <h3 className="text-md font-semibold text-gray-700 mb-4">Évolution sur la période ({period === 'monthly' ? 'par semaine' : ''})</h3>
-                            <div className="bg-gray-50 p-4 rounded-lg h-72">
+                            <h3 className="text-md font-semibold text-[--text-muted] mb-4">Évolution sur la période ({period === 'monthly' ? 'par semaine' : ''})</h3>
+                            <div className="bg-brand-50/60 p-4 rounded-lg h-72">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart data={chartData.lineChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                        <YAxis tick={{ fontSize: 12 }} tickFormatter={(value: number) => reportType === 'fines' ? `${value / 1000}k` : value} />
+                                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
+                                        <YAxis tick={{ fontSize: 12, fill: 'var(--text-muted)' }} tickFormatter={(value: number) => reportType === 'fines' ? `${value / 1000}k` : value} />
                                         <Tooltip />
                                         <Legend wrapperStyle={{ fontSize: '14px' }} />
-                                        <Line type="monotone" dataKey={reportType === 'fines' ? 'Montant (CDF)' : 'Impressions'} stroke="#3B82F6" strokeWidth={2} activeDot={{ r: 8 }} />
+                                        <Line type="monotone" dataKey={reportType === 'fines' ? 'Montant (CDF)' : 'Impressions'} stroke="var(--brand-400)" strokeWidth={2} activeDot={{ r: 8 }} />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </div>
@@ -301,29 +301,29 @@ const ReportsPage: React.FC = () => {
                     )}
                     
                     <section>
-                        <h3 className="text-md font-semibold text-gray-700 mb-4">Répartitions</h3>
+                        <h3 className="text-md font-semibold text-[--text-muted] mb-4">Répartitions</h3>
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                            <div className="lg:col-span-2 bg-gray-50 p-4 rounded-lg">
-                                <h4 className="font-medium text-gray-600 text-sm text-center mb-2">{reportType === 'fines' ? 'Répartition par Statut' : 'Répartition par Type'}</h4>
+                            <div className="lg:col-span-2 bg-brand-50/60 p-4 rounded-lg">
+                                <h4 className="font-medium text-[--text-muted] text-sm text-center mb-2">{reportType === 'fines' ? 'Répartition par Statut' : 'Répartition par Type'}</h4>
                                 <ResponsiveContainer width="100%" height={250}>
                                     <PieChart>
-                                        <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelStyle={{ fontSize: '12px' }}>
+                                        <Pie data={chartData.pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelStyle={{ fontSize: '12px', fill: 'var(--text-main)' }}>
                                             {chartData.pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
                                         </Pie>
                                         <Tooltip />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div className="lg:col-span-3 bg-gray-50 p-4 rounded-lg">
-                                <h4 className="font-medium text-gray-600 text-sm text-center mb-2">{reportType === 'fines' ? 'Amendes par Zone' : 'Impressions par Agent'}</h4>
+                            <div className="lg:col-span-3 bg-brand-50/60 p-4 rounded-lg">
+                                <h4 className="font-medium text-[--text-muted] text-sm text-center mb-2">{reportType === 'fines' ? 'Amendes par Zone' : 'Impressions par Agent'}</h4>
                                 <ResponsiveContainer width="100%" height={250}>
                                     <BarChart data={chartData.barData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                         <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                                        <YAxis tick={{ fontSize: 12 }} />
+                                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
+                                        <YAxis tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
                                         <Tooltip />
                                         <Legend wrapperStyle={{ fontSize: '14px' }}/>
-                                        <Bar dataKey={reportType === 'fines' ? 'Amendes' : 'Impressions'} fill="#3B82F6" />
+                                        <Bar dataKey={reportType === 'fines' ? 'Amendes' : 'Impressions'} fill="var(--brand-400)" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -331,18 +331,18 @@ const ReportsPage: React.FC = () => {
                     </section>
 
                     <section>
-                        <h3 className="text-md font-semibold text-gray-700 mb-4">Liste détaillée</h3>
-                        <div className="overflow-x-auto border rounded-lg">
+                        <h3 className="text-md font-semibold text-[--text-muted] mb-4">Liste détaillée</h3>
+                        <div className="overflow-x-auto border border-black/5 rounded-lg">
                             <table className="min-w-full text-sm">
                                {reportType === 'fines' ? (
                                     <>
-                                        <thead className="text-left text-gray-500 bg-gray-50"><tr><th className="p-3 font-semibold">Date</th><th className="p-3 font-semibold">Plaque</th><th className="p-3 font-semibold">Motif</th><th className="p-3 font-semibold">Montant</th><th className="p-3 font-semibold">Statut</th><th className="p-3 font-semibold">Zone</th></tr></thead>
-                                        <tbody>{(generatedData as (Fine & { zone: string })[]).map(item => <tr key={item.id} className="border-t hover:bg-gray-50"><td className="p-3 text-gray-800">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 font-mono text-gray-800">{item.plate}</td><td className="p-3 text-gray-800">{item.reason}</td><td className="p-3 text-gray-800">{item.amount.toLocaleString()} FC</td><td className="p-3 text-gray-800">{item.status}</td><td className="p-3 text-gray-800">{item.zone}</td></tr>)}</tbody>
+                                        <thead className="text-left text-[--text-muted] bg-brand-50/50"><tr><th className="p-3 font-semibold">Date</th><th className="p-3 font-semibold">Plaque</th><th className="p-3 font-semibold">Motif</th><th className="p-3 font-semibold">Montant</th><th className="p-3 font-semibold">Statut</th><th className="p-3 font-semibold">Zone</th></tr></thead>
+                                        <tbody className="bg-white">{(generatedData as (Fine & { zone: string })[]).map(item => <tr key={item.id} className="border-t border-black/5 hover:bg-brand-50/50"><td className="p-3 text-[--text-main]">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 font-mono text-[--text-main]">{item.plate}</td><td className="p-3 text-[--text-main]">{item.reason}</td><td className="p-3 text-[--text-main]">{item.amount.toLocaleString()} FC</td><td className="p-3 text-[--text-main]">{item.status}</td><td className="p-3 text-[--text-main]">{item.zone}</td></tr>)}</tbody>
                                     </>
                                ) : (
                                     <>
-                                        <thead className="text-left text-gray-500 bg-gray-50"><tr><th className="p-3 font-semibold">Date</th><th className="p-3 font-semibold">Type</th><th className="p-3 font-semibold">Identifiant</th><th className="p-3 font-semibold">Agent</th><th className="p-3 font-semibold">Zone</th></tr></thead>
-                                        <tbody>{(generatedData as Impression[]).map(item => <tr key={item.id} className="border-t hover:bg-gray-50"><td className="p-3 text-gray-800">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 text-gray-800">{item.documentType}</td><td className="p-3 font-mono text-gray-800">{item.identifier}</td><td className="p-3 text-gray-800">{item.agentName}</td><td className="p-3 text-gray-800">{item.zone}</td></tr>)}</tbody>
+                                        <thead className="text-left text-[--text-muted] bg-brand-50/50"><tr><th className="p-3 font-semibold">Date</th><th className="p-3 font-semibold">Type</th><th className="p-3 font-semibold">Identifiant</th><th className="p-3 font-semibold">Agent</th><th className="p-3 font-semibold">Zone</th></tr></thead>
+                                        <tbody className="bg-white">{(generatedData as Impression[]).map(item => <tr key={item.id} className="border-t border-black/5 hover:bg-brand-50/50"><td className="p-3 text-[--text-main]">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 text-[--text-main]">{item.documentType}</td><td className="p-3 font-mono text-[--text-main]">{item.identifier}</td><td className="p-3 text-[--text-main]">{item.agentName}</td><td className="p-3 text-[--text-main]">{item.zone}</td></tr>)}</tbody>
                                     </>
                                )}
                             </table>

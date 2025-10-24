@@ -15,15 +15,15 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, change, c
   const changeColor = changeType === 'increase' ? 'text-green-500' : 'text-red-500';
   
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm flex flex-col justify-between">
+    <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5 flex flex-col justify-between">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-        <div className="p-2 bg-blue-100 rounded-full">
-          <Icon className="w-6 h-6 text-blue-600" />
+        <h3 className="text-sm font-medium text-[--text-muted]">{title}</h3>
+        <div className="p-2 bg-brand-100 rounded-full">
+          <Icon className="w-6 h-6 text-[--brand-400]" />
         </div>
       </div>
       <div>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
+        <p className="text-3xl font-bold text-[--text-main]">{value}</p>
         <div className="flex items-center text-sm mt-2">
           {change && (
             <span className={`flex items-center mr-2 font-semibold ${changeColor}`}>
@@ -31,7 +31,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, change, c
               {change}
             </span>
           )}
-          <span className="text-gray-500">{description}</span>
+          <span className="text-[--text-muted]">{description}</span>
         </div>
       </div>
     </div>
