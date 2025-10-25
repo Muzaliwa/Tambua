@@ -1,61 +1,92 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Car, CircleAlert, FileText, Settings, Printer, Bike, Users, BarChartBig } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  LayoutDashboard,
+  Car,
+  Bike,
+  CircleDollarSign,
+  AlertTriangle,
+  Users,
+  FileText,
+  Settings,
+  Printer,
+} from 'lucide-react';
+
+const Logo = () => (
+    <div className="flex items-center justify-center h-16 border-b border-black/5">
+        <h1 className="text-xl font-bold text-[--brand-600]">TAMBUA</h1>
+    </div>
+);
+
+interface NavItemProps {
+  to: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ to, icon: Icon, children }) => {
+  const location = useLocation();
+  // Exact match for dashboard, startsWith for others
+  const isActive = to.endsWith('dashboard') ? location.pathname === to : location.pathname.startsWith(to);
+  
+  return (
+    <li>
+      <NavLink
+        to={to}
+        className={`flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-lg
+          ${isActive 
+            ? 'bg-gradient-to-r from-[--brand-400] to-[--brand-600] text-white shadow-md' 
+            : 'text-[--text-muted] hover:bg-black/5'
+          }`
+        }
+      >
+        <Icon className="w-5 h-5 mr-3" />
+        <span>{children}</span>
+      </NavLink>
+    </li>
+  );
+};
 
 const Sidebar: React.FC = () => {
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  const adminNavItems = [
-    { to: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
-    { to: '/vehicles', icon: Car, label: 'Voitures' },
-    { to: '/motorcycles', icon: Bike, label: 'Motos' },
-    { to: '/fines', icon: CircleAlert, label: 'Amendes' },
-    { to: '/infractions', icon: FileText, label: 'Infractions' },
-    { to: '/agents', icon: Users, label: 'Agents' },
-    { to: '/reports', icon: BarChartBig, label: 'Rapports' },
-    { to: '/settings', icon: Settings, label: 'Paramètres' },
-  ];
+    const supervisorLinks = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
+        { to: '/vehicles', icon: Car, label: 'Véhicules' },
+        { to: '/motorcycles', icon: Bike, label: 'Motos' },
+        { to: '/fines', icon: CircleDollarSign, label: 'Amendes' },
+        { to: '/infractions', icon: AlertTriangle, label: 'Infractions' },
+        { to: '/agents', icon: Users, label: 'Agents' },
+        { to: '/reports', icon: FileText, label: 'Rapports' },
+    ];
 
-  const agentNavItems = [
-    { to: '/agent-dashboard', icon: LayoutDashboard, label: 'Accueil Agent' },
-    { to: '/printing', icon: Printer, label: 'Impression' },
-    { to: '/settings', icon: Settings, label: 'Paramètres' },
-  ];
+    const agentLinks = [
+        { to: '/agent-dashboard', icon: LayoutDashboard, label: 'Portail Agent' },
+        { to: '/printing', icon: Printer, label: 'Impression' },
+    ];
 
-  const navItems = user?.role === 'Superviseur' ? adminNavItems : agentNavItems;
+    const links = user?.role === 'Superviseur' ? supervisorLinks : agentLinks;
 
-  return (
-    <aside className="hidden md:flex flex-col w-64 bg-[--brand-800] text-brand-100 shadow-lg">
-      <div className="flex items-center justify-center h-20 border-b border-brand-600/50">
-        <div className="text-2xl font-bold text-white">
-          <span className="bg-brand-50 text-[--brand-400] rounded-md px-2 py-1 text-3xl">T</span>
-          ambua
-        </div>
-      </div>
-      <nav className="flex-1 px-4 py-6">
-        <ul>
-          {navItems.map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 my-1 rounded-lg transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-[--brand-600] text-white font-semibold'
-                      : 'hover:bg-[--brand-600]/60 hover:text-white'
-                  }`
-                }
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="ml-4">{item.label}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
-  );
+    return (
+        <aside className="w-64 flex-shrink-0 bg-white/70 backdrop-blur-xl border-r border-black/5 flex flex-col">
+            <Logo />
+            <nav className="flex-1 px-4 py-6 space-y-2">
+                <ul>
+                    {links.map((link) => (
+                        <NavItem key={link.to} to={link.to} icon={link.icon}>
+                            {link.label}
+                        </NavItem>
+                    ))}
+                </ul>
+            </nav>
+            <div className="px-4 py-4 border-t border-black/5">
+                 <NavItem to="/settings" icon={Settings}>
+                    Paramètres
+                </NavItem>
+            </div>
+        </aside>
+    );
 };
 
 export default Sidebar;

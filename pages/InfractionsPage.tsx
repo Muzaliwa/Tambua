@@ -1,133 +1,112 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Infraction } from '../types';
-import { Search, PlusCircle } from 'lucide-react';
+import { Plus, AlertTriangle } from 'lucide-react';
+import ActionMenu from '../components/Admin/ActionMenu';
 import AddInfractionModal from '../components/Admin/AddInfractionModal';
 import EditInfractionModal from '../components/Admin/EditInfractionModal';
-import ActionMenu from '../components/Admin/ActionMenu';
 
-const mockInfractions: Infraction[] = [
-  { id: '3f7d2b8a', code: 'RDC-ENV-021', label: 'Pollution sonore', description: 'Nuisances sonores excessives dépassant les limites autorisées.', severity: 'MOYEN', amount: 75000, createdAt: '2025-10-20T09:02:50.531Z', updatedAt: '2025-10-20T09:02:50.531Z' },
-  { id: 'a1b2c3d4', code: 'RDC-PARK-001', label: 'Stationnement interdit', description: 'Stationnement sur une ligne rouge ou dans une zone non autorisée.', severity: 'LEGER', amount: 40000, createdAt: '2025-09-15T11:30:00.000Z', updatedAt: '2025-09-15T11:30:00.000Z' },
-  { id: 'e8f45c45', code: 'RDC-SEC-099', label: 'Excès de vitesse', description: 'Dépassement de la limite de vitesse autorisée en zone urbaine.', severity: 'GRAVE', amount: 120000, createdAt: '2025-10-20T09:02:50.531Z', updatedAt: '2025-10-20T09:02:50.531Z' },
-  { id: 'b5e6f7a8', code: 'RDC-DOC-005', label: 'Défaut d\'assurance', description: 'Circulation sans une assurance valide pour le véhicule.', severity: 'TRES_GRAVE', amount: 200000, createdAt: '2025-08-01T14:00:00.000Z', updatedAt: '2025-08-01T14:00:00.000Z' },
-  { id: 'c9d8e7f6', code: 'RDC-EQ-012', label: 'Défaut de casque', description: 'Conducteur de moto ou passager sans casque de protection.', severity: 'LEGER', amount: 25000, createdAt: '2025-07-22T08:45:00.000Z', updatedAt: '2025-07-22T08:45:00.000Z' },
+// Mock Data
+const initialInfractions: Infraction[] = [
+    { id: '1', code: 'RDC-SEC-001', label: 'Excès de vitesse', description: 'Dépassement de la vitesse autorisée en agglomération.', severity: 'GRAVE', amount: 120000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: '2', code: 'RDC-STA-003', label: 'Stationnement interdit', description: 'Véhicule garé sur une zone non autorisée.', severity: 'LEGER', amount: 50000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: '3', code: 'RDC-ASS-010', label: 'Défaut d\'assurance', description: 'Circulation sans une assurance valide.', severity: 'TRES_GRAVE', amount: 200000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    { id: '4', code: 'RDC-EQU-005', label: 'Défaut de casque', description: 'Conduite de moto sans port du casque.', severity: 'MOYEN', amount: 25000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ];
 
 const SeverityBadge: React.FC<{ severity: Infraction['severity'] }> = ({ severity }) => {
-    const severityClasses = {
-        'LEGER': 'bg-blue-100 text-[--accent-blue]',
+    const classes = {
+        'LEGER': 'bg-blue-100 text-blue-800',
         'MOYEN': 'bg-yellow-100 text-yellow-800',
-        'GRAVE': 'bg-pink-100 text-[--accent-pink]',
+        'GRAVE': 'bg-orange-100 text-orange-800',
         'TRES_GRAVE': 'bg-red-100 text-red-800',
     };
-    const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
-    return <span className={`${baseClasses} ${severityClasses[severity].replace('_', ' ')}`}>{severity.replace('_', ' ')}</span>;
+    const labels = {'LEGER': 'Léger', 'MOYEN': 'Moyen', 'GRAVE': 'Grave', 'TRES_GRAVE': 'Très Grave' };
+    return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[severity]}`}>{labels[severity]}</span>;
 };
 
-
 const InfractionsPage: React.FC = () => {
-  const [infractions, setInfractions] = useState<Infraction[]>(mockInfractions);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [editingInfraction, setEditingInfraction] = useState<Infraction | null>(null);
+    const [infractions, setInfractions] = useState<Infraction[]>(initialInfractions);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingInfraction, setEditingInfraction] = useState<Infraction | null>(null);
 
-  const filteredInfractions = useMemo(() => {
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    if (!lowerCaseQuery) {
-      return infractions;
-    }
-    return infractions.filter(infraction =>
-      infraction.label.toLowerCase().includes(lowerCaseQuery) ||
-      infraction.code.toLowerCase().includes(lowerCaseQuery) ||
-      infraction.description.toLowerCase().includes(lowerCaseQuery)
-    );
-  }, [searchQuery, infractions]);
-
-  const handleAddInfraction = (newInfractionData: Omit<Infraction, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newInfraction: Infraction = {
-        ...newInfractionData,
-        id: Math.random().toString(36).substring(2, 10),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    const handleAdd = (newInfractionData: Omit<Infraction, 'id' | 'createdAt' | 'updatedAt'>) => {
+        const newInfraction: Infraction = {
+            ...newInfractionData,
+            id: String(Date.now()),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        setInfractions(prev => [newInfraction, ...prev]);
     };
-    setInfractions(prev => [newInfraction, ...prev]);
-  };
-  
-  const handleSaveInfraction = (updatedInfraction: Infraction) => {
-    setInfractions(prev => prev.map(i => i.id === updatedInfraction.id ? updatedInfraction : i));
-    setEditingInfraction(null);
-  };
 
-  const handleDeleteInfraction = (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette infraction ?')) {
-        setInfractions(prev => prev.filter(i => i.id !== id));
-    }
-  };
+    const handleSave = (updatedInfraction: Infraction) => {
+        setInfractions(prev => prev.map(i => i.id === updatedInfraction.id ? { ...updatedInfraction, updatedAt: new Date().toISOString() } : i));
+        setEditingInfraction(null);
+    };
 
-  return (
-    <>
-      <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between mb-6 border-b border-black/5 pb-4">
-          <div>
-            <h1 className="text-xl font-bold text-[--text-main]">Gestion des Infractions</h1>
-            <p className="text-sm text-[--text-muted]">Liste des infractions et leurs barèmes.</p>
-          </div>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Rechercher (label, code...)" 
-                className="pl-10 pr-4 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] placeholder:text-gray-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+    const handleDelete = (infractionId: string) => {
+        if (window.confirm("Êtes-vous sûr de vouloir supprimer cette infraction ?")) {
+            setInfractions(prev => prev.filter(i => i.id !== infractionId));
+        }
+    };
+
+    return (
+        <>
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-[--text-main]">Catalogue des Infractions</h1>
+                    <p className="text-sm text-[--text-muted]">Gérez les types d'infractions et les montants des amendes.</p>
+                </div>
+
+                <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
+                    <div className="flex justify-end mb-4">
+                        <button onClick={() => setIsAddModalOpen(true)} className="flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow">
+                            <Plus className="w-5 h-5 mr-2" />
+                            Ajouter une Infraction
+                        </button>
+                    </div>
+
+                     <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                            <thead className="text-left text-[--text-muted] bg-brand-50/50">
+                                <tr>
+                                    <th className="p-3 font-semibold">Code</th>
+                                    <th className="p-3 font-semibold">Label</th>
+                                    <th className="p-3 font-semibold">Sévérité</th>
+                                    <th className="p-3 font-semibold">Montant (CDF)</th>
+                                    <th className="p-3 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white">
+                                {infractions.map(infraction => (
+                                    <tr key={infraction.id} className="border-t border-black/5 hover:bg-brand-50/50">
+                                        <td className="p-3 font-mono text-xs text-[--text-main]">{infraction.code}</td>
+                                        <td className="p-3 font-semibold text-[--text-main]">{infraction.label}</td>
+                                        <td className="p-3"><SeverityBadge severity={infraction.severity} /></td>
+                                        <td className="p-3 font-semibold text-[--text-main]">{infraction.amount.toLocaleString()}</td>
+                                        <td className="p-3">
+                                            <ActionMenu
+                                                onEdit={() => setEditingInfraction(infraction)}
+                                                onDelete={() => handleDelete(infraction.id)}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                     {infractions.length === 0 && (
+                        <div className="text-center py-12 text-[--text-muted]">
+                            <AlertTriangle className="mx-auto w-12 h-12 mb-2" />
+                            <p>Aucune infraction définie.</p>
+                        </div>
+                    )}
+                </div>
             </div>
-            <button 
-                onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow">
-                <PlusCircle className="w-5 h-5 mr-2" />
-                Ajouter
-            </button>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-black/5">
-            <thead className="bg-brand-50/50">
-              <tr>
-                {['Code', 'Label', 'Sévérité', 'Montant', 'Actions'].map(header => (
-                  <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-[--text-muted] uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-black/5">
-              {filteredInfractions.map((infraction) => (
-                <tr key={infraction.id} className="hover:bg-brand-50/50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[--text-muted]">{infraction.code}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[--text-main]">{infraction.label}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm"><SeverityBadge severity={infraction.severity} /></td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[--text-main]">{infraction.amount.toLocaleString()} CDF</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <ActionMenu
-                        onEdit={() => setEditingInfraction(infraction)}
-                        onDelete={() => handleDeleteInfraction(infraction.id)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {isAddModalOpen && <AddInfractionModal onClose={() => setIsAddModalOpen(false)} onAdd={handleAddInfraction} />}
-      {editingInfraction && <EditInfractionModal infraction={editingInfraction} onClose={() => setEditingInfraction(null)} onSave={handleSaveInfraction} />}
-    </>
-  );
+            {isAddModalOpen && <AddInfractionModal onAdd={handleAdd} onClose={() => setIsAddModalOpen(false)} />}
+            {editingInfraction && <EditInfractionModal infraction={editingInfraction} onSave={handleSave} onClose={() => setEditingInfraction(null)} />}
+        </>
+    );
 };
 
 export default InfractionsPage;

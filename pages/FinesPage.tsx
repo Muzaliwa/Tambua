@@ -1,239 +1,155 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Fine, Vehicle, Motorcycle } from '../types';
-import { Search, Filter, FileDown } from 'lucide-react';
+import { Fine } from '../types';
+import { Search, FileDown } from 'lucide-react';
 import ActionMenu from '../components/Admin/ActionMenu';
 import EditFineModal from '../components/Admin/EditFineModal';
 
-// --- MOCK DATA ---
-const mockVehicles: Vehicle[] = [
-  { id: '1', photo: 'https://picsum.photos/seed/salomon/150/150', owner: 'Salomon', address: 'Goma', taxId: 'NA', plate: '1234AB', makeModel: 'Nissan Juke', year: 2000, color: 'Rouge', documentStatus: 'Valide', insuranceStatus: 'Valide' },
-  { id: '2', photo: 'https://picsum.photos/seed/richard/150/150', owner: 'Richard', address: 'Bukavu', taxId: '0922', plate: 'BB123C', makeModel: 'Toyota Rav4', year: 2000, color: 'Verte', documentStatus: 'Expiré', insuranceStatus: 'Valide' },
-  { id: '3', photo: 'https://picsum.photos/seed/jean/150/150', owner: 'Jean', address: 'Kinshasa', taxId: '1023', plate: 'KIN89Z', makeModel: 'Honda CRV', year: 2015, color: 'Noire', documentStatus: 'Valide', insuranceStatus: 'Bientôt expiré' },
-  { id: '4', photo: 'https://picsum.photos/seed/marie/150/150', owner: 'Marie', address: 'Goma', taxId: '4589', plate: 'GOM45D', makeModel: 'Mercedes C300', year: 2018, color: 'Blanche', documentStatus: 'Valide', insuranceStatus: 'Valide' },
+// MOCK DATA
+const initialFines: Fine[] = [
+    { id: '1', plate: 'GOM45D', reason: 'Feu rouge grillé', driver: 'Marie', location: 'Centre-ville', date: '2025-10-10', amount: 80000, currency: 'CDF', status: 'En attente' },
+    { id: '2', plate: 'BB123C', reason: 'Assurance expirée', driver: 'Richard', location: 'Keshero', date: '2025-10-07', amount: 200000, currency: 'CDF', status: 'Payée' },
+    { id: '3', plate: 'KIN89Z', reason: 'Stationnement interdit', driver: 'Jean', location: 'Lycée Wima', date: '2025-10-05', amount: 50000, currency: 'CDF', status: 'En retard' },
+    { id: '4', plate: '1234AB', reason: 'Excès de vitesse', driver: 'Salomon', location: 'Aéroport', date: '2025-10-02', amount: 120000, currency: 'CDF', status: 'Payée' },
+    { id: '5', plate: 'GOM 456 CD', reason: 'Défaut de casque', driver: 'Kavira Mukeba', location: 'Rond-point Signers', date: '2025-10-01', amount: 25000, currency: 'CDF', status: 'En attente' },
 ];
 
-const mockMotorcycles: Motorcycle[] = [
-  { id: '1', photo: 'https://picsum.photos/seed/moto1/150/150', owner: 'Kavira Mukeba', address: 'Goma', plate: 'GOM 456 CD', makeModel: 'TVS Star HLX 125', year: 2023, color: 'Rouge', documentStatus: 'Bientôt expiré', insuranceStatus: 'Valide' },
-  { id: '2', photo: 'https://picsum.photos/seed/moto2/150/150', owner: 'Furaha Mutinga', address: 'Goma', plate: 'GOM 789 EF', makeModel: 'Haojue 150', year: 2022, color: 'Noire', documentStatus: 'Valide', insuranceStatus: 'Expiré' },
-  { id: '3', photo: 'https://picsum.photos/seed/moto3/150/150', owner: 'Agent Tambua', address: 'Goma', plate: 'GOM 101 GH', makeModel: 'Boxer BM 150', year: 2024, color: 'Bleue', documentStatus: 'Valide', insuranceStatus: 'Valide' },
-];
-
-const mockFines: Fine[] = [
-    { id: '1', plate: 'GOM45D', reason: 'Feu rouge grillé', driver: 'Marie', location: 'Centre-ville', date: '10/10/2025', amount: 80000, currency: 'CDF', status: 'En attente' },
-    { id: '2', plate: 'BB123C', reason: 'Assurance expirée', driver: 'Richard', location: 'Keshero', date: '07/10/2025', amount: 200000, currency: 'CDF', status: 'Payée' },
-    { id: '3', plate: 'KIN89Z', reason: 'Stationnement interdit', driver: 'Jean', location: 'Lycée Wima', date: '05/10/2025', amount: 50000, currency: 'CDF', status: 'En retard' },
-    { id: '4', plate: '1234AB', reason: 'Excès de vitesse', driver: 'Salomon', location: 'Aéroport', date: '02/10/2025', amount: 120000, currency: 'CDF', status: 'Payée' },
-    { id: '5', plate: 'GOM 456 CD', reason: 'Défaut de casque', driver: 'Kavira Mukeba', location: 'Rond-point Signers', date: '01/10/2025', amount: 25000, currency: 'CDF', status: 'En attente' },
-];
-// --- END MOCK DATA ---
-
-// Add declaration for jsPDF
-declare global {
-  interface Window {
-    jspdf: any;
-  }
-}
-
-const StatusBadge: React.FC<{ status: Fine['status'] }> = ({ status }) => {
-    const statusClasses = {
+const FineStatusBadge: React.FC<{ status: Fine['status'] }> = ({ status }) => {
+    const classes = {
         'Payée': 'bg-[#1f8a3a] text-white',
         'En retard': 'bg-[#dc2626] text-white',
         'En attente': 'bg-[#f59e0b] text-white',
     };
-    const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full inline-block';
-    return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
-};
-
-type EnrichedFine = Fine & {
-    ownerPhoto: string;
-    vehicleId?: string;
-    motorcycleId?: string;
+    return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[status]}`}>{status}</span>;
 };
 
 const FinesPage: React.FC = () => {
-    const navigate = useNavigate();
-    const [fines, setFines] = useState<Fine[]>(mockFines);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState('Tous');
+    const [fines, setFines] = useState<Fine[]>(initialFines);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [editingFine, setEditingFine] = useState<Fine | null>(null);
 
-    const enrichedFines = useMemo(() => {
-        return fines.map(fine => {
-            const vehicle = mockVehicles.find(v => v.plate === fine.plate);
-            const motorcycle = mockMotorcycles.find(m => m.plate === fine.plate);
-            const ownerInfo = vehicle || motorcycle;
-            return {
-                ...fine,
-                ownerPhoto: ownerInfo?.photo || 'https://picsum.photos/seed/placeholder/150/150',
-                vehicleId: vehicle?.id,
-                motorcycleId: motorcycle?.id,
-            };
-        });
-    }, [fines]);
+    const filteredFines = useMemo(() =>
+        fines.filter(f =>
+            (f.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             f.driver.toLowerCase().includes(searchTerm.toLowerCase())) &&
+            (statusFilter === 'all' || f.status === statusFilter)
+        ), [fines, searchTerm, statusFilter]);
 
-    const filteredFines = useMemo(() => {
-        const lowerCaseQuery = searchQuery.toLowerCase();
-        return enrichedFines.filter(fine => {
-            const matchesSearch =
-                fine.plate.toLowerCase().includes(lowerCaseQuery) ||
-                fine.driver.toLowerCase().includes(lowerCaseQuery) ||
-                fine.reason.toLowerCase().includes(lowerCaseQuery);
-
-            const matchesStatus =
-                statusFilter === 'Tous' || fine.status === statusFilter;
-            
-            return matchesSearch && matchesStatus;
-        });
-    }, [searchQuery, statusFilter, enrichedFines]);
-    
-    const handleDelete = (id: string) => {
-        if(window.confirm("Êtes-vous sûr de vouloir supprimer cette amende ?")) {
-            setFines(prev => prev.filter(f => f.id !== id));
-        }
-    };
-    
     const handleSave = (updatedFine: Fine) => {
         setFines(prev => prev.map(f => f.id === updatedFine.id ? updatedFine : f));
         setEditingFine(null);
     };
 
-    const handleRowClick = (fine: EnrichedFine) => {
-        if (fine.vehicleId) {
-            navigate(`/vehicles/${fine.vehicleId}`);
-        } else if (fine.motorcycleId) {
-            navigate(`/motorcycles/${fine.motorcycleId}`);
-        } else {
-            console.warn(`Aucun dossier trouvé pour la plaque : ${fine.plate}`);
+    const handleDelete = (fineId: string) => {
+        if(window.confirm("Êtes-vous sûr de vouloir supprimer cette amende ?")) {
+            setFines(prev => prev.filter(f => f.id !== fineId));
         }
     };
-    
+
     const exportToPdf = () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
+    
         const title = "Rapport des Amendes";
-        const date = new Date().toLocaleDateString('fr-FR');
-        doc.text(`${title} - ${date}`, 14, 15);
-
-        const tableColumn = ['Propriétaire', 'Plaque', 'Motif', 'Montant', 'Statut Amende'];
-        const tableRows: (string|number)[][] = [];
-
-        filteredFines.forEach(fine => {
-            const fineData = [
-                fine.driver,
-                fine.plate,
-                fine.reason,
-                `${fine.amount.toLocaleString()} ${fine.currency}`,
-                fine.status,
-            ];
-            tableRows.push(fineData);
-        });
-
+        const date = new Date().toLocaleDateString('fr-CA');
+        doc.text(title, 14, 15);
+        doc.text(`Date: ${date}`, 14, 22);
+    
+        const head = [['Plaque', 'Conducteur', 'Motif', 'Montant', 'Date', 'Statut']];
+        const body = filteredFines.map(f => [
+            f.plate,
+            f.driver,
+            f.reason,
+            `${f.amount.toLocaleString()} ${f.currency}`,
+            new Date(f.date).toLocaleDateString(),
+            f.status,
+        ]);
+    
         doc.autoTable({
-            head: [tableColumn],
-            body: tableRows,
-            startY: 20,
+            head: head,
+            body: body,
+            startY: 30,
             theme: 'grid',
+            headStyles: { fillColor: [7, 166, 224] },
         });
-        
+    
         doc.save(`rapport_amendes_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     return (
         <>
-            <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
-                {/* Header */}
-                <div className="flex flex-wrap items-center justify-between mb-6 border-b border-black/5 pb-4">
-                    <div>
-                        <h1 className="text-xl font-bold text-[--text-main]">Gestion des Amendes</h1>
-                        <p className="text-sm text-[--text-muted]">Liste de toutes les amendes enregistrées.</p>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-4 md:mt-0">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-[--text-main]">Gestion des Amendes</h1>
+                    <p className="text-sm text-[--text-muted]">Suivez et gérez toutes les amendes enregistrées.</p>
+                </div>
+                 <div className="bg-gradient-to-b from-white/90 to-white/85 p-6 rounded-xl shadow-glass border border-black/5">
+                    <div className="flex flex-wrap gap-4 justify-between items-center mb-4">
+                        <div className="relative w-full max-w-sm">
+                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Rechercher (plaque, conducteur...)"
-                                className="pl-10 pr-4 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] placeholder:text-gray-400"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Rechercher par plaque, conducteur..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 text-sm bg-white border border-black/10 rounded-lg focus:ring-2 focus:ring-[--brand-400]"
                             />
                         </div>
-                        <div className="relative">
-                            <select
-                                className="appearance-none pl-4 pr-10 py-2 bg-white border border-black/10 rounded-lg focus:ring-[--brand-400] focus:border-[--brand-400] text-[--text-main] text-sm"
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="Tous">Tous les statuts</option>
-                                <option value="Payée">Payée</option>
-                                <option value="En attente">En attente</option>
-                                <option value="En retard">En retard</option>
-                            </select>
-                             <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        <div className="flex items-center space-x-4">
+                             <div className="flex items-center space-x-2">
+                                <label htmlFor="statusFilter" className="text-sm font-medium text-[--text-muted]">Statut:</label>
+                                <select
+                                    id="statusFilter"
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="px-3 py-2 text-sm bg-white border border-black/10 rounded-lg focus:ring-2 focus:ring-[--brand-400]"
+                                >
+                                    <option value="all">Tous</option>
+                                    <option value="En attente">En attente</option>
+                                    <option value="Payée">Payée</option>
+                                    <option value="En retard">En retard</option>
+                                </select>
+                             </div>
+                             <button onClick={exportToPdf} className="flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-[linear-gradient(90deg,var(--brand-400),var(--brand-600))] hover:shadow-lg hover:shadow-[--brand-400]/20 rounded-lg transition-shadow">
+                                <FileDown className="w-4 h-4 mr-2" />
+                                PDF
+                            </button>
                         </div>
-                        <button onClick={exportToPdf} className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 hover:shadow-lg rounded-lg transition-shadow">
-                            <FileDown className="w-5 h-5 mr-2" />
-                            PDF
-                        </button>
+                    </div>
+
+                     <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                            <thead className="text-left text-[--text-muted] bg-brand-50/50">
+                                <tr>
+                                    <th className="p-3 font-semibold">Plaque</th>
+                                    <th className="p-3 font-semibold">Conducteur</th>
+                                    <th className="p-3 font-semibold">Motif</th>
+                                    <th className="p-3 font-semibold">Montant (CDF)</th>
+                                    <th className="p-3 font-semibold">Date</th>
+                                    <th className="p-3 font-semibold">Statut</th>
+                                    <th className="p-3 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white">
+                                {filteredFines.map(fine => (
+                                    <tr key={fine.id} className="border-t border-black/5 hover:bg-brand-50/50">
+                                        <td className="p-3 font-mono text-xs text-[--text-main]">{fine.plate}</td>
+                                        <td className="p-3 font-semibold text-[--text-main]">{fine.driver}</td>
+                                        <td className="p-3 text-[--text-muted]">{fine.reason}</td>
+                                        <td className="p-3 font-semibold text-[--text-main]">{fine.amount.toLocaleString()}</td>
+                                        <td className="p-3 text-[--text-muted]">{new Date(fine.date).toLocaleDateString()}</td>
+                                        <td className="p-3"><FineStatusBadge status={fine.status} /></td>
+                                        <td className="p-3">
+                                            <ActionMenu onEdit={() => setEditingFine(fine)} onDelete={() => handleDelete(fine.id)} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-black/5">
-                        <thead className="bg-brand-50/50">
-                            <tr>
-                                {['Propriétaire', 'Plaque', 'Motif', 'Montant', 'Statut Amende', 'Actions'].map(header => (
-                                    <th key={header} scope="col" className={`px-6 py-3 text-left text-xs font-medium text-[--text-muted] uppercase tracking-wider ${header === 'Actions' ? 'text-right' : ''}`}>
-                                        {header}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-black/5">
-                            {filteredFines.map((fine) => (
-                                <tr 
-                                    key={fine.id} 
-                                    onClick={() => handleRowClick(fine)} 
-                                    className="hover:bg-brand-50/50 cursor-pointer rounded-lg transition-all"
-                                    tabIndex={0}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleRowClick(fine)}
-                                >
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="flex-shrink-0 h-10 w-10">
-                                                <img className="h-10 w-10 rounded-full object-cover" src={fine.ownerPhoto} alt={fine.driver} />
-                                            </div>
-                                            <div className="ml-4">
-                                                <div className="text-sm font-medium text-[--text-main]">{fine.driver}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[--text-muted]">{fine.plate}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[--text-main]">{fine.reason}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[--text-main] font-semibold">{fine.amount.toLocaleString()} {fine.currency}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm"><StatusBadge status={fine.status} /></td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <ActionMenu
-                                            onEdit={() => setEditingFine(fine)}
-                                            onDelete={() => handleDelete(fine.id)}
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
             </div>
-            {editingFine && (
-                <EditFineModal
-                    fine={editingFine}
-                    onClose={() => setEditingFine(null)}
-                    onSave={handleSave}
-                />
-            )}
+            {editingFine && <EditFineModal fine={editingFine} onSave={handleSave} onClose={() => setEditingFine(null)} />}
         </>
     );
 };
