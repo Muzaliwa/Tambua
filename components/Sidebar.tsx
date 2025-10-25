@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 
 const Logo = () => (
-    <div className="flex items-center justify-center h-16 border-b border-black/5">
-        <h1 className="text-xl font-bold text-[--brand-600]">TAMBUA</h1>
+    <div className="flex items-center justify-center h-20 px-4 border-b border-black/5">
+        <img src="/assets/logo.svg" alt="Tambua Logo" className="h-10" />
     </div>
 );
 

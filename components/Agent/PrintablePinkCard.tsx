@@ -18,8 +18,8 @@ interface PrintablePinkCardProps {
 
 const Field: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div>
-        <p className="text-[6px] uppercase text-gray-700 tracking-wider">{label}</p>
-        <p className="text-[8px] font-bold uppercase font-mono text-black">{value}</p>
+        <p className="text-[5.5px] uppercase text-gray-600 tracking-wide">{label}</p>
+        <p className="text-[7px] font-bold uppercase font-mono text-black">{value}</p>
     </div>
 );
 
@@ -40,31 +40,31 @@ const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
   
   return (
     <div className="printable-area print-card-format">
-      <div className="w-[85.6mm] h-[53.98mm] bg-pink-50 border border-pink-200 rounded-lg shadow-md p-2 flex flex-col font-sans relative overflow-hidden">
+      <div className="w-[85.6mm] h-[53.98mm] bg-pink-50 border border-pink-200 rounded-lg shadow-md p-[5px] flex flex-col font-sans relative overflow-hidden">
         {/* Background watermark */}
         <div className="absolute inset-0 flex items-center justify-center z-0">
-            <p className="text-7xl font-black text-pink-500 opacity-10 rotate-[-20deg]">RDC</p>
+            <p className="text-[56px] font-black text-pink-500 opacity-10 rotate-[-20deg]">RDC</p>
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b-2 border-dotted border-pink-300 pb-1 z-10">
+        <div className="flex items-center justify-between border-b-2 border-dotted border-pink-300 pb-0.5 z-10">
           <div className="text-left">
-            <p className="text-[8px] font-bold text-black">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
-            <p className="text-[7px] text-black font-semibold">CERTIFICAT D'IMMATRICULATION</p>
+            <p className="text-[7px] font-bold text-black">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO</p>
+            <p className="text-[6px] text-black font-semibold">CERTIFICAT D'IMMATRICULATION</p>
           </div>
         </div>
         
         {/* Body */}
-        <div className="flex-1 flex pt-2 z-10">
-          <div className="w-full space-y-1">
+        <div className="flex-1 flex pt-1 z-10">
+          <div className="w-full space-y-0.5">
             <Field label="A. N° IMMATRICULATION" value={data.plate} />
             <Field label="C.1 NOM & ADRESSE" value={`${data.owner}, ${data.address}`} />
-            <div className="grid grid-cols-2 gap-x-2">
+            <div className="grid grid-cols-2 gap-x-1">
                 <Field label="D.1 MARQUE" value={data.make} />
                 <Field label="D.3 MODÈLE" value={data.model} />
             </div>
             <Field label="E. N° CHÂSSIS" value={data.chassis} />
-             <div className="grid grid-cols-4 gap-x-2">
+             <div className="grid grid-cols-4 gap-x-1">
                 <Field label="F.1 ANNÉE" value={data.year} />
                 <Field label="J. COULEUR" value={data.color} />
                 <Field label="B. DATE ÉMISSION" value={new Date(data.issueDate).toLocaleDateString('fr-FR')} />
@@ -74,8 +74,8 @@ const PrintablePinkCard: React.FC<PrintablePinkCardProps> = ({ data }) => {
         </div>
 
         {/* QR Code */}
-        <div className="absolute bottom-1 right-1 z-20">
-            <QRCodeGenerator text={qrCodeText} size={48} />
+        <div className="absolute bottom-[5px] right-[5px] z-20">
+            <QRCodeGenerator text={qrCodeText} size={38} />
         </div>
       </div>
     </div>
