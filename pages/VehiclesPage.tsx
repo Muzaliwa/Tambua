@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Vehicle } from '../types';
-import { Search, Plus, ShieldCheck, ShieldOff, FileDown } from 'lucide-react';
+import { Search, Plus, FileDown } from 'lucide-react';
 import ActionMenu from '../components/Admin/ActionMenu';
 import EditVehicleModal from '../components/Admin/EditVehicleModal';
 
@@ -16,14 +16,12 @@ const initialVehicles: Vehicle[] = [
 
 const ValidityStatus: React.FC<{ status: 'Valide' | 'Bientôt expiré' | 'Expiré' }> = ({ status }) => {
     const classes = {
-        'Valide': { icon: ShieldCheck, text: 'text-green-600', bg: 'bg-green-100' },
-        'Bientôt expiré': { icon: ShieldCheck, text: 'text-yellow-600', bg: 'bg-yellow-100' },
-        'Expiré': { icon: ShieldOff, text: 'text-red-600', bg: 'bg-red-100' },
+        'Valide': 'bg-green-600',
+        'Bientôt expiré': 'bg-yellow-500',
+        'Expiré': 'bg-red-600',
     };
-    const { icon: Icon, text, bg } = classes[status];
     return (
-        <span className={`px-2 py-1 text-xs font-semibold rounded-full inline-flex items-center ${text} ${bg}`}>
-            <Icon className="w-4 h-4 mr-1.5" />
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full text-white ${classes[status]}`}>
             {status}
         </span>
     );

@@ -15,10 +15,10 @@ const initialInfractions: Infraction[] = [
 
 const SeverityBadge: React.FC<{ severity: Infraction['severity'] }> = ({ severity }) => {
     const classes = {
-        'LEGER': 'bg-blue-100 text-blue-800',
-        'MOYEN': 'bg-yellow-100 text-yellow-800',
-        'GRAVE': 'bg-orange-100 text-orange-800',
-        'TRES_GRAVE': 'bg-red-100 text-red-800',
+        'LEGER': 'bg-blue-500 text-white',
+        'MOYEN': 'bg-yellow-500 text-white',
+        'GRAVE': 'bg-orange-500 text-white',
+        'TRES_GRAVE': 'bg-red-600 text-white',
     };
     const labels = {'LEGER': 'Léger', 'MOYEN': 'Moyen', 'GRAVE': 'Grave', 'TRES_GRAVE': 'Très Grave' };
     return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[severity]}`}>{labels[severity]}</span>;

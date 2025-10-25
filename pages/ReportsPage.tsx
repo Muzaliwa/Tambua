@@ -47,6 +47,16 @@ const StatCard: React.FC<{title: string, value: string | number, icon: React.Ele
     </div>
 );
 
+const FineStatusBadge: React.FC<{ status: Fine['status'] }> = ({ status }) => {
+    const classes = {
+        'Payée': 'bg-[#1f8a3a] text-white',
+        'En retard': 'bg-[#dc2626] text-white',
+        'En attente': 'bg-[#f59e0b] text-white',
+    };
+    return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[status]}`}>{status}</span>;
+};
+
+
 const CHART_COLORS = ['var(--brand-400)', 'var(--brand-600)', 'var(--accent-blue)', 'var(--accent-pink)', '#10B981'];
 
 const ReportsPage: React.FC = () => {
@@ -337,7 +347,7 @@ const ReportsPage: React.FC = () => {
                                {reportType === 'fines' ? (
                                     <>
                                         <thead className="text-left text-[--text-muted] bg-brand-50/50"><tr><th className="p-3 font-semibold">Date</th><th className="p-3 font-semibold">Plaque</th><th className="p-3 font-semibold">Motif</th><th className="p-3 font-semibold">Montant</th><th className="p-3 font-semibold">Statut</th><th className="p-3 font-semibold">Zone</th></tr></thead>
-                                        <tbody className="bg-white">{(generatedData as (Fine & { zone: string })[]).map(item => <tr key={item.id} className="border-t border-black/5 hover:bg-brand-50/50"><td className="p-3 text-[--text-main]">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 font-mono text-[--text-main]">{item.plate}</td><td className="p-3 text-[--text-main]">{item.reason}</td><td className="p-3 text-[--text-main]">{item.amount.toLocaleString()} FC</td><td className="p-3 text-[--text-main]">{item.status}</td><td className="p-3 text-[--text-main]">{item.zone}</td></tr>)}</tbody>
+                                        <tbody className="bg-white">{(generatedData as (Fine & { zone: string })[]).map(item => <tr key={item.id} className="border-t border-black/5 hover:bg-brand-50/50"><td className="p-3 text-[--text-main]">{new Date(item.date).toLocaleDateString()}</td><td className="p-3 font-mono text-[--text-main]">{item.plate}</td><td className="p-3 text-[--text-main]">{item.reason}</td><td className="p-3 text-[--text-main]">{item.amount.toLocaleString()} FC</td><td className="p-3"><FineStatusBadge status={item.status} /></td><td className="p-3 text-[--text-main]">{item.zone}</td></tr>)}</tbody>
                                     </>
                                ) : (
                                     <>

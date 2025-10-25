@@ -13,6 +13,14 @@ const initialAgents: Agent[] = [
   { id: 'agent-4', name: 'Pierre Simon', email: 'pierre.simon@tambua.com', avatar: 'PS', status: 'Actif', registrationsToday: 8, finesCollectedToday: 250000 },
 ];
 
+const AgentStatusBadge: React.FC<{ status: Agent['status'] }> = ({ status }) => {
+    const classes = {
+        'Actif': 'bg-green-600 text-white',
+        'Inactif': 'bg-gray-500 text-white',
+    };
+    return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[status]}`}>{status}</span>;
+};
+
 const AgentsPage: React.FC = () => {
     const [agents, setAgents] = useState<Agent[]>(initialAgents);
     const [searchTerm, setSearchTerm] = useState('');
@@ -147,9 +155,7 @@ const AgentsPage: React.FC = () => {
                                             </Link>
                                         </td>
                                         <td className="p-3">
-                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${agent.status === 'Actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                                {agent.status}
-                                            </span>
+                                            <AgentStatusBadge status={agent.status} />
                                         </td>
                                         <td className="p-3 font-semibold text-[--text-main]">{agent.registrationsToday}</td>
                                         <td className="p-3 font-semibold text-[--text-main]">{agent.finesCollectedToday.toLocaleString()} CDF</td>

@@ -42,8 +42,8 @@
 
   /* --- PRINT STYLES --- */
   @media print {
-    /* Force printing of background colors and images */
-    .printable-area, .printable-area * {
+    /* Force printing of background colors and images globally for print media */
+    * {
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -58,30 +58,15 @@
       visibility: visible;
     }
 
-    /* Position the printable area to take up the whole page */
+    /* Position the printable area to take up the whole page defined by @page */
     .printable-area {
-      position: fixed; /* Use fixed for better consistency across browsers */
+      position: absolute;
       left: 0;
       top: 0;
       margin: 0;
       padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    /* Explicitly size the card content to CR80 dimensions inside the printable area */
-    .printable-area .print-card-format {
-        width: 85.6mm;
-        height: 53.98mm;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        border: none !important;
-        box-shadow: none !important;
-        transform: scale(1); /* Ensure no transforms are applied */
+      width: 100%;
+      height: 100%;
     }
 
     /* Hide elements marked as non-printable */
@@ -91,6 +76,11 @@
   }
 
   /* --- @page RULES --- */
+  /* A good default to remove browser headers/footers */
+  @page {
+    margin: 0mm;
+  }
+
   @page receipt-a6 {
     size: A6;
     margin: 10mm;
