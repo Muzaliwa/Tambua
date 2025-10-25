@@ -40,34 +40,64 @@
     --text-muted: #526a6c;
   }
 
+  /* --- PRINT STYLES --- */
   @media print {
+    /* Force printing of background colors and images */
+    .printable-area, .printable-area * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Hide everything on the page by default */
     body * {
       visibility: hidden;
     }
+
+    /* Make only the printable area and its children visible */
     .printable-area, .printable-area * {
       visibility: visible;
     }
+
+    /* Position the printable area to take up the whole page */
     .printable-area {
-      position: absolute;
+      position: fixed; /* Use fixed for better consistency across browsers */
       left: 0;
       top: 0;
-      width: 100%;
-      height: 100%;
       margin: 0;
       padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+    
+    /* Explicitly size the card content to CR80 dimensions inside the printable area */
+    .printable-area .print-card-format {
+        width: 85.6mm;
+        height: 53.98mm;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        border: none !important;
+        box-shadow: none !important;
+        transform: scale(1); /* Ensure no transforms are applied */
+    }
+
+    /* Hide elements marked as non-printable */
     .no-print, .no-print * {
       display: none !important;
     }
   }
 
+  /* --- @page RULES --- */
   @page receipt-a6 {
     size: A6;
     margin: 10mm;
   }
   
   @page card-format {
-    size: 85.6mm 53.98mm; /* Credit card size */
+    size: 85.6mm 53.98mm; /* Credit card size (CR80) */
     margin: 0;
   }
 
@@ -76,6 +106,7 @@
     margin: 10mm;
   }
 
+  /* Assign page rules to elements */
   .print-receipt-a6 {
     page: receipt-a6;
   }
@@ -85,6 +116,7 @@
   .print-doc-a5 {
     page: doc-a5;
   }
+  /* --- END PRINT STYLES --- */
 
   /* Fix for browser autofill background color */
   input:-webkit-autofill,
